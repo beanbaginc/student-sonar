@@ -1,0 +1,31 @@
+{
+  "name": "student-sonar",
+  "version": "0.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Trowbridge <david@beanbaginc.com>",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.1.8",
+    "express": "^4.11.1",
+    "moment": "^2.9.0",
+    "morgan": "^1.5.1",
+    "node-fetch": "^1.0.3",
+    "q": "^1.1.2"
+  },
+  "jspm": {
+    "directories": {
+      "baseURL": "lib/frontend",
+      "packages": "jspm_packages"
+    },
+    "dependencies": {
+      "d3": "^3.5.3",
+      "fetch": "npm:whatwg-fetch@^0.7.0",
+      "moment": "^2.9.0",
+      "webcomponents": "npm:webcomponents.js@^0.5.3"
+    }
+  }
+}
