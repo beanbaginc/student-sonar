@@ -31,8 +31,7 @@ module.exports = config;
 
 Finally, you'll need a `students.json` file. Again, talk to David for this.
 
-Running
--------
+To run (for development):
 ```
 $ nodemon
 ```
@@ -40,5 +39,10 @@ $ nodemon
 
 TODO
 ----
-* Use `History.pushState()` and some client-side routing to make the back
-  button work
+* Stick the reviewboard reviews API extension somewhere and add support for it.
+* Extract custom element templates into their own files and use HTML imports.
+* Set up a build system that can run `jspm build-sfx` and replace the packager
+  scripts with the single `build.js` file.
+* Figure out deployment.
+* Switch to LESS?
+* Show a spinner while loading async content.

@@ -1,0 +1,151 @@
+body {
+    font-family: 'Lato';
+}
+
+h2 {
+    font-size: 1.2em;
+}
+
+.groups {
+    display: flex;
+}
+
+.group {
+    margin: 0.5em;
+}
+
+
+.students {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.student {
+    margin: 8px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.6);
+}
+
+.student:hover {
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+
+
+/* Cal-HeatMap CSS */
+x-student-view /deep/ .cal-heatmap-container {
+    display: block;
+}
+
+x-student-view /deep/ .graph-label {
+    fill: #999;
+    font-size: 10px;
+}
+
+x-student-view /deep/ .graph, .graph-legend rect {
+    shape-rendering: crispedges;
+}
+
+x-student-view /deep/ .graph-rect {
+    fill: #ededed;
+}
+
+x-student-view /deep/ .graph-subdomain-group rect:hover {
+    stroke: #000;
+    stroke-width: 1px;
+}
+
+x-student-view /deep/ .subdomain-text {
+    font-size: 8px;
+    fill: #999;
+    pointer-events: none;
+}
+
+x-student-view /deep/ .hover_cursor:hover {
+    cursor: pointer;
+}
+
+x-student-view /deep/ .qi {
+    background-color: #999;
+    fill: #999;
+}
+
+x-student-view /deep/ .q1 {
+    background-color: #dae289;
+    fill: #dae289;
+}
+
+x-student-view /deep/ .q2 {
+    background-color: #cedb9c;
+    fill: #9cc069;
+}
+
+x-student-view /deep/ .q3 {
+    background-color: #b5cf6b;
+    fill: #669d45;
+}
+
+x-student-view /deep/ .q4 {
+    background-color: #637939;
+    fill: #637939;
+}
+
+x-student-view /deep/ .q5 {
+    background-color: #3b6427;
+    fill: #3b6427;
+}
+
+x-student-view /deep/ rect.highlight {
+    stroke: #444;
+    stroke-width: 1;
+}
+
+x-student-view /deep/ text.highlight {
+    fill: #444;
+}
+
+x-student-view /deep/ rect.now {
+    stroke: red;
+}
+
+x-student-view /deep/ text.now {
+    fill: red;
+    font-weight: 800;
+}
+
+x-student-view /deep/ .domain-background {
+    fill: none;
+    shape-rendering: crispedges;
+}
+
+x-student-view /deep/ .ch-tooltip {
+    padding: 10px;
+    background: #222;
+    color: #bbb;
+    font-size: 12px;
+    line-height: 1.4;
+    width: 140px;
+    position: absolute;
+    z-index: 99999;
+    text-align: center;
+    border-radius: 2px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+    display: none;
+    box-sizing: border-box;
+}
+
+x-student-view /deep/ .ch-tooltip::after{
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    content: "";
+    padding: 0;
+    display: "block";
+    bottom: -6px;
+    left: 50%;
+    margin-left: -6px;
+    border-width: 6px 6px 0;
+    border-top-color: #222;
+}

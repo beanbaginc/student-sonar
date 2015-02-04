@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Student Sonar</title>
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" rel="stylesheet" />
+        <link rel="stylesheet" href="style.css" shim-shadowdom />
+        <script src="/jspm_packages/npm/webcomponents.js@0.5.3/webcomponents.min.js"></script>
+    </head>
+    <body>
+        <template id="x-student-card-template">
+            <style>
+                :host {
+                    border-radius: 6px;
+                    width: 250px;
+                    height: 48px;
+                    overflow: hidden;
+                    cursor: pointer;
+                }
+
+                #avatar {
+                    width: 48px;
+                    height: 48px;
+                }
+
+                #name {
+                    margin-left: 0.5em;
+                    line-height: 48px;
+                    vertical-align: top;
+                }
+            </style>
+
+            <img id="avatar">
+            <span id="name"></span>
+        </template>
+
+        <template id="x-student-view-template">
+            <style>
+                :host {
+                    width: 100%;
+                    height: 100%;
+                    left: 0;
+                    top: 0;
+                    background-color: white;
+                    position: fixed;
+                    z-index: 1;
+
+                    display: flex;
+                }
+
+                h2 {
+                    font-size: 1.2em;
+                }
+
+                #bio {
+                    flex-grow: 0;
+                    width: 256px;
+                    padding: 8px;
+                    border-right: 1px solid black;
+                    text-align: center;
+                }
+
+                #details {
+                    margin: 1em;
+		    overflow: scroll;
+                }
+
+                #avatar {
+                    width: 192px;
+                    height: 192px;
+                }
+
+                #back {
+                    cursor: pointer;
+                }
+
+                #review-requests li {
+                    margin-bottom: 2px;
+                }
+
+                #review-requests a {
+                    text-decoration: none;
+                    color: black;
+                }
+            </style>
+            <div id="bio">
+                <h1 id="name"></h1>
+                <img id="avatar">
+                <h3 id="school"></h3>
+                <a id="email"></a>
+            </div>
+            <div id="details">
+            </div>
+        </template>
+
+        <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
+        <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
+        <script src="/jspm_packages/system.js"></script>
+        <script src="/lib/frontend/config.js"></script>
+        <script>
+            System.import('lib/frontend/main')
+                .catch(console.error.bind(console));
+        </script>
+    </body>
+</html>
+
