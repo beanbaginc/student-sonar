@@ -39,7 +39,6 @@ $ nodemon
 
 TODO
 ----
-* Stick the reviewboard reviews API extension somewhere and add support for it.
 * Extract custom element templates into their own files and use HTML imports.
 * Set up a build system that can run `jspm build-sfx` and replace the packager
   scripts with the single `build.js` file.

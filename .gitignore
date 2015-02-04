@@ -1,3 +1,5 @@
+*.egg-info
+*.pyc
 *.swp
 config.js
 jspm_packages
