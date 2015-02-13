@@ -1,6 +1,8 @@
 *.egg-info
 *.pyc
 *.swp
+build.js
+build.js.map
 config.js
 jspm_packages
 node_modules

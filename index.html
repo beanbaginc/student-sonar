@@ -64,7 +64,7 @@
 
                 #details {
                     flex-grow: 1;
-		    overflow: scroll;
+                    overflow: scroll;
                 }
 
                 #avatar {
@@ -123,14 +123,19 @@
             </div>
         </template>
 
-        <script type="text/javascript" src="//d3js.org/d3.v3.min.js"></script>
-        <script type="text/javascript" src="//cdn.jsdelivr.net/cal-heatmap/3.3.10/cal-heatmap.min.js"></script>
+        <!-- use these for development -->
         <script src="/jspm_packages/system.js"></script>
         <script src="/lib/frontend/config.js"></script>
         <script>
             System.import('lib/frontend/main')
                 .catch(console.error.bind(console));
         </script>
+
+        <!-- use these for deployment -->
+        <!--
+        <script src="/jspm_packages/traceur-runtime.js"></script>
+        <script src="/lib/frontend/build.js"></script>
+        -->
     </body>
 </html>
 
