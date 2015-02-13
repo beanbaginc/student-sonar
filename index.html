@@ -57,12 +57,13 @@
                     flex-grow: 0;
                     width: 256px;
                     padding: 8px;
-                    border-right: 1px solid black;
+                    border-right: 1px solid darkgrey;
                     text-align: center;
+                    background-color: ghostwhite;
                 }
 
                 #details {
-                    margin: 1em;
+                    flex-grow: 1;
 		    overflow: scroll;
                 }
 
@@ -75,11 +76,15 @@
                     cursor: pointer;
                 }
 
-                #review-requests li {
+                ul {
+                    margin: 0;
+                }
+
+                li {
                     margin-bottom: 2px;
                 }
 
-                #review-requests a {
+                a {
                     text-decoration: none;
                     color: black;
                 }
@@ -91,6 +96,30 @@
                 <a id="email"></a>
             </div>
             <div id="details">
+            </div>
+        </template>
+
+        <template id="x-student-view-summary-entry-template">
+            <style>
+                :host {
+                    border-bottom: 1px solid lightgrey;
+                    display: flex;
+                    padding: 1em;
+                }
+
+                #title {
+                    flex: none;
+                    width: 8em;
+                }
+
+                #content {
+                    flex-grow: 1;
+                }
+            </style>
+
+            <div id="title"></div>
+            <div id="content">
+                <content></content>
             </div>
         </template>
 
