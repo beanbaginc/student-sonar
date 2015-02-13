@@ -40,8 +40,5 @@ $ nodemon
 TODO
 ----
 * Extract custom element templates into their own files and use HTML imports.
-* Set up a build system that can run `jspm build-sfx` and replace the packager
-  scripts with the single `build.js` file.
-* Figure out deployment.
 * Switch to LESS?
 * Show a spinner while loading async content.

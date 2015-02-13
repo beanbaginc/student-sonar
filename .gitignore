@@ -1,9 +1,10 @@
 *.egg-info
 *.pyc
 *.swp
+build
 build.js
 build.js.map
-config.js
+config.json
 jspm_packages
 node_modules
 students.json

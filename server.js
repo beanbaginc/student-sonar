@@ -1,21 +1,25 @@
 var express = require('express'),
     logger = require('morgan'),
-    config = require('./config'),
-    routes = require('./lib/routes')(config),
-    server = express(),
-    staticPaths = [
-        'lib',
-        'jspm_packages',
-        'style.css'
-    ],
-    i;
+    Q = require('q'),
+    routes = require('./lib/routes'),
+    loadConfig = require('./lib/config'),
+    app = express();
 
-server.use(logger('combined'));
-for (i = 0; i < staticPaths.length; i++) {
-    server.use('/' + staticPaths[i], express.static(staticPaths[i]));
+if (app.get('env') === 'production') {
+    app.use('/scripts', express.static('build/scripts'));
+    app.use('/css', express.static('build/css'));
+} else {
+    app.use('/lib', express.static('lib'));
+    app.use('/jspm_packages', express.static('jspm_packages'));
+    app.use('/style.css', express.static('style.css'));
 }
-server.use('/', routes);
 
-server.listen(config.port, function() {
-    console.log('Listening on port %d', config.port);
+loadConfig(app).then(function() {
+    var port = app.get('port');
+
+    app.use('/', routes(app));
+    app.use(logger('combined'));
+    app.listen(port, function() {
+        console.log('Listening on port %d', port);
+    });
 });

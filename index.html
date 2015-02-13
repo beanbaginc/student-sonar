@@ -4,8 +4,12 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Student Sonar</title>
+        <!-- build:css -->
         <link rel="stylesheet" href="style.css" shim-shadowdom />
+        <!-- endbuild -->
+        <!-- build:webcomponents -->
         <script src="/jspm_packages/npm/webcomponents.js@0.5.3/webcomponents.min.js"></script>
+        <!-- endbuild -->
     </head>
     <body>
         <template id="x-student-card-template">
@@ -122,19 +126,14 @@
             </div>
         </template>
 
-        <!-- use these for development -->
+        <!-- build:js -->
         <script src="/jspm_packages/system.js"></script>
         <script src="/lib/frontend/config.js"></script>
         <script>
             System.import('lib/frontend/main')
                 .catch(console.error.bind(console));
         </script>
-
-        <!-- use these for deployment -->
-        <!--
-        <script src="/jspm_packages/traceur-runtime.js"></script>
-        <script src="/lib/frontend/build.js"></script>
-        -->
+        <!-- endbuild -->
     </body>
 </html>
 
