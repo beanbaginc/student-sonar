@@ -14,7 +14,7 @@ setup(
     author_email='support@beanbaginc.com',
     maintainer='Beanbag, Inc.',
     maintainer_email='support@beanbaginc.com',
-    packages=["rb_reviews_api"],
+    packages=[b'rb_reviews_api'],
     entry_points={
         'reviewboard.extensions':
             '%s = rb_reviews_api.extension:ReviewsAPI' % PACKAGE,

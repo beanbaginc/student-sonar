@@ -7,7 +7,12 @@ from djblets.util.decorators import augment_method_from
 from djblets.webapi.decorators import webapi_request_fields
 from reviewboard.reviews.models.review import Review
 from reviewboard.webapi.decorators import webapi_check_local_site
-from reviewboard.webapi.resources.base_review import BaseReviewResource
+
+# This nonsense is required to avoid a circular dependency when building
+# packages.
+from reviewboard.webapi.resources import resources
+resources.review
+from reviewboard.webapi.resources.review import BaseReviewResource
 
 
 class ReviewResource(BaseReviewResource):
