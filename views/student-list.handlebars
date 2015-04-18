@@ -1,0 +1,122 @@
+<template id="x-student-card-template">
+    <style>
+        :host {
+            border-radius: 6px;
+            width: 250px;
+            height: 48px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        #avatar {
+            width: 48px;
+            height: 48px;
+        }
+
+        #name {
+            margin-left: 0.5em;
+            line-height: 48px;
+            vertical-align: top;
+        }
+    </style>
+
+    <img id="avatar">
+    <span id="name"></span>
+</template>
+
+<template id="x-student-view-template">
+    <style>
+        :host {
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            background-color: white;
+            position: fixed;
+            z-index: 1;
+
+            display: flex;
+        }
+
+        h2 {
+            font-size: 1.2em;
+        }
+
+        #bio {
+            flex-grow: 0;
+            width: 256px;
+            padding: 8px;
+            border-right: 1px solid darkgrey;
+            text-align: center;
+            background-color: ghostwhite;
+        }
+
+        #details {
+            flex-grow: 1;
+            overflow: scroll;
+        }
+
+        #avatar {
+            width: 192px;
+            height: 192px;
+        }
+
+        #back {
+            cursor: pointer;
+        }
+
+        ul {
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 2px;
+        }
+
+        a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+    <div id="bio">
+        <h1 id="name"></h1>
+        <img id="avatar">
+        <h3 id="school"></h3>
+        <a id="email"></a>
+    </div>
+    <div id="details">
+    </div>
+</template>
+
+<template id="x-summary-entry-template">
+    <style>
+        :host {
+            border-bottom: 1px solid lightgrey;
+            display: flex;
+            padding: 1em;
+        }
+
+        #title {
+            flex: none;
+            width: 8em;
+        }
+
+        #content {
+            flex-grow: 1;
+        }
+    </style>
+
+    <div id="title"></div>
+    <div id="content">
+        <content></content>
+    </div>
+</template>
+
+<!-- build:js -->
+<script src="/jspm_packages/system.js"></script>
+<script src="/lib/frontend/config.js"></script>
+<script>
+    System.import('lib/frontend/main')
+        .catch(console.error.bind(console));
+</script>
+<!-- endbuild -->

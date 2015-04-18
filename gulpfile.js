@@ -3,6 +3,7 @@ var fs = require('fs'),
     autoprefixer = require('gulp-autoprefixer'),
     del = require('del'),
     htmlreplace = require('gulp-html-replace'),
+    image = require('gulp-image'),
     minifycss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
     shell = require('gulp-shell');
@@ -12,7 +13,7 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('html', function() {
-    return gulp.src('index.html')
+    return gulp.src('views/**')
         .pipe(htmlreplace({
             css: {
                 src: ['/css/style.min.css'],
@@ -26,7 +27,7 @@ gulp.task('html', function() {
                 '/scripts/webcomponents.min.js'
             ]
         }))
-        .pipe(gulp.dest('build/'));
+        .pipe(gulp.dest('build/views/'));
 });
 
 gulp.task('jspm-bundle', function() {
@@ -73,6 +74,12 @@ gulp.task('css', function() {
         .pipe(gulp.dest('build/css/'));
 });
 
+gulp.task('images', function() {
+    return gulp.src('images/*')
+        .pipe(image())
+        .pipe(gulp.dest('build/images/'));
+});
+
 gulp.task('default', ['clean', 'jspm-bundle'], function() {
-    gulp.start('html', 'javascript', 'sourcemaps', 'css');
+    gulp.start('html', 'javascript', 'sourcemaps', 'css', 'images');
 });
