@@ -19,10 +19,8 @@ if (app.get('env') === 'production') {
     app.use('/style.css', express.static('style.css'));
 }
 
-loadConfig(app)
-    .then(function() {
-        var port = app.get('port');
-
+loadConfig()
+    .then(function(config) {
         app.use(logger('combined'));
         app.use(errorhandler());
 
@@ -31,9 +29,9 @@ loadConfig(app)
         }));
         app.set('view engine', 'handlebars');
 
-        app.use('/', routes(app));
-        app.listen(port, function() {
-            console.log('Listening on port %d', port);
+        app.use('/', routes(config));
+        app.listen(config.port, function() {
+            console.log('Listening on port %d', config.port);
         });
     })
     .catch(function(error) {
