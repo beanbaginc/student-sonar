@@ -4,7 +4,7 @@ var errorhandler = require('errorhandler'),
     logger = require('morgan'),
     Q = require('q'),
     routes = require('./lib/routes'),
-    loadConfig = require('./lib/config'),
+    init = require('./lib/init'),
     app = express();
 
 if (app.get('env') === 'production') {
@@ -19,8 +19,10 @@ if (app.get('env') === 'production') {
     app.use('/style.css', express.static('style.css'));
 }
 
-loadConfig()
-    .then(function(config) {
+init()
+    .then(function(options) {
+        var port = options.config.port;
+
         app.use(logger('combined'));
         app.use(errorhandler());
 
@@ -29,11 +31,10 @@ loadConfig()
         }));
         app.set('view engine', 'handlebars');
 
-        app.use('/', routes(config));
-        app.listen(config.port, function() {
-            console.log('Listening on port %d', config.port);
+        app.use('/', routes(options));
+
+        app.listen(port, function() {
+            console.log('Listening on port %d', port);
         });
     })
-    .catch(function(error) {
-        console.error(error);
-    });
+    .catch(console.error.bind(console));

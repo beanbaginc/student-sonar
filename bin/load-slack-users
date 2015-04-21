@@ -1,0 +1,56 @@
+#!/app/bin/node
+
+var Q = require('q'),
+    init = require('../lib/init'),
+    schema = require('../lib/schema');
+
+function updateUser(user) {
+    var deferred = Q.defer();
+
+    if (user.is_bot) {
+        deferred.resolve();
+    } else {
+        console.log('Saving data for %s (%s - %s)', user.real_name, user.name, user.id);
+
+        try {
+            query = schema.User.findOneAndUpdate(
+                { slack_user_id: user.id },
+                {
+                    email: user.profile.email,
+                    slack_user_id: user.id,
+                    slack_username: user.name,
+                    name: user.real_name,
+                    avatar: user.profile.image_192,
+                    timezone: user.tz
+                },
+                { upsert: true },
+                deferred.makeNodeResolver());
+        } catch(e) {
+            deferred.reject(e);
+        }
+    }
+
+    return deferred.promise;
+}
+
+init()
+    .then(function(options) {
+        var slack = require('../lib/slack')(options.config),
+            deferred = Q.defer();
+
+        slack.getUsers().then(function(users) {
+            var i, promises = [];
+
+            for (i = 0; i < users.members.length; i++) {
+                promises.push(updateUser(users.members[i]));
+            }
+
+            return Q.all(promises)
+                .then(deferred.resolve)
+                .catch(deferred.reject);
+        });
+
+        return deferred.promise;
+    })
+    .then(process.exit)
+    .catch(console.error.bind(console));
