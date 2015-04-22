@@ -12,6 +12,25 @@
         <!-- endbuild -->
     </head>
     <body>
+        {{#if user}}
+            <header>
+                <div>
+                    <img src="{{user.avatar}}" width="36" height="36">
+                    {{user.realName}}
+                </div>
+
+                <div>
+                    {{!--
+                    {{#if isAdmin}}
+                    <a href="/admin">Admin</a>
+                    {{/if}}
+                    --}}
+
+                    <a href="/logout">Log out</a>
+                </div>
+            </header>
+        {{/if}}
+
         {{{body}}}
     </body>
 </html>

@@ -2,7 +2,10 @@ var errorhandler = require('errorhandler'),
     express = require('express'),
     handlebars = require('express-handlebars'),
     logger = require('morgan'),
+    passport = require('passport'),
     Q = require('q'),
+    session = require('express-session'),
+    MongoStore = require('connect-mongo')(session),
     routes = require('./lib/routes'),
     init = require('./lib/init'),
     app = express();
@@ -32,6 +35,18 @@ init()
             app.use('/jspm_packages', express.static('jspm_packages'));
             app.use('/style.css', express.static('style.css'));
         }
+
+        app.use(session({
+            store: new MongoStore({
+                mongooseConnection: options.db
+            }),
+            resave: false,
+            saveUninitialized: true,
+            secret: options.config.sessionSecret
+        }));
+
+        app.use(passport.initialize());
+        app.use(passport.session());
 
         app.use(logger('combined'));
         app.use(errorhandler());
