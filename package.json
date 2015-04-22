@@ -8,7 +8,7 @@
     "postinstall": "jspm install && gulp"
   },
   "engines": {
-    "node": "0.10.x"
+    "node": "0.12.x"
   },
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
