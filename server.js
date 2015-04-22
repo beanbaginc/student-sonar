@@ -27,7 +27,8 @@ init()
         app.use(errorhandler());
 
         app.engine('handlebars', handlebars({
-            defaultLayout: 'main'
+            defaultLayout: 'main',
+            compilerOptions: {}
         }));
         app.set('view engine', 'handlebars');
 
