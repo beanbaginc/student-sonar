@@ -1,4 +1,4 @@
-#!/app/bin/node
+#!/usr/bin/env node
 
 var Q = require('q'),
     init = require('../lib/init'),
