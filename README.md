@@ -4,8 +4,6 @@ Student Sonar
 Getting set up
 --------------
 ```
-$ npm install -g jspm
-$ npm install -g nodemon
 $ npm install
 $ jspm install
 ```
@@ -13,27 +11,29 @@ $ jspm install
 You'll also need to create a `config.json` file that defines all the different
 API keys and hostnames for things. Talk to David if you need some secrets.
 ```javascript
-var config = {};
-
-config.awsRegion = '';
-config.awsAccessKeyId = '';
-config.awsSecretAccessKey = '';
-
-config.reviewboardAPIToken = '';
-config.reviewboardHost = '';
-
-config.slackLogsTableName = '';
-config.slackHost = '';
-config.slackToken = '';
-
-module.exports = config;
+{
+    "awsAccessKeyId": "",
+    "awsRegion": "",
+    "awsSecretAccessKey": "",
+    "mongodbURI": "",
+    "port": 8001,
+    "reviewboardAPIToken": "",
+    "reviewboardHost": "",
+    "sessionSecret": "",
+    "slackClientID": "",
+    "slackClientSecret": "",
+    "slackHost": "",
+    "slackLogsTableName": "",
+    "slackToken": ""
+}
 ```
 
-Finally, you'll need a `students.json` file. Again, talk to David for this.
+Finally, you'll need a MongoDB server. If you would like to run against the
+public one, talk to David about it.
 
 To run (for development):
 ```
-$ nodemon
+$ npm start
 ```
 
 
