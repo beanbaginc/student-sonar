@@ -112,12 +112,14 @@
     </div>
 </template>
 
+<script>
+    window.user = {{{userJSON}}};
+    window.isAdmin = {{isAdmin}};
+</script>
 <!-- build:js -->
 <script src="/jspm_packages/system.js"></script>
 <script src="/lib/frontend/config.js"></script>
 <script>
-    window.user = {{{userJSON}}};
-    window.isAdmin = {{isAdmin}};
     System.import('lib/frontend/main')
         .catch(console.error.bind(console));
 </script>
