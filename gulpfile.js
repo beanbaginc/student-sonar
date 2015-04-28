@@ -4,6 +4,7 @@ var fs = require('fs'),
     del = require('del'),
     htmlreplace = require('gulp-html-replace'),
     image = require('gulp-image'),
+    less = require('gulp-less'),
     minifycss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
     shell = require('gulp-shell');
@@ -67,7 +68,8 @@ gulp.task('sourcemaps', function() {
 });
 
 gulp.task('css', function() {
-    return gulp.src('style.css')
+    return gulp.src('css/style.less')
+        .pipe(less())
         .pipe(autoprefixer('>5%'))
         .pipe(rename({ suffix: '.min' }))
         .pipe(minifycss())

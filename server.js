@@ -29,10 +29,10 @@ init()
             handlebarsOptions.layoutsDir = viewsDir + '/layouts';
             handlebarsOptions.partialsDir = viewsDir + '/partials';
         } else {
+            app.use('/css', express.static('css'));
             app.use('/images', express.static('images'));
             app.use('/lib', express.static('lib'));
             app.use('/jspm_packages', express.static('jspm_packages'));
-            app.use('/style.css', express.static('style.css'));
 
             app.use(errorhandler());
         }
