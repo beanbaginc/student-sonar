@@ -54,6 +54,7 @@
         #details {
             flex-grow: 1;
             overflow: scroll;
+            margin-bottom: 37px;
         }
 
         #avatar {
@@ -63,6 +64,16 @@
 
         #back {
             cursor: pointer;
+        }
+
+        #timeline {
+            padding: 0;
+        }
+
+        #timeline .details {
+            padding-left: 2em;
+            color: darkgrey;
+            max-width: 40em;
         }
 
         ul {
@@ -110,6 +121,43 @@
     <div id="content">
         <content></content>
     </div>
+</template>
+
+<template id="x-event-list-template">
+    <style>
+        ::host {
+            padding: 0;
+            list-style: none;
+            text-align: left;
+        }
+    </style>
+
+    <content></content>
+</template>
+
+<template id="x-event-day-template">
+    <style>
+        ::host {
+            text-align: left;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #date {
+            margin-top: 1em;
+            color: darkred;
+            font-size: 90%;
+        }
+    </style>
+
+    <div id="date"></div>
+    <ul>
+        <content></content>
+    </ul>
 </template>
 
 <script>

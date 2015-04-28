@@ -80,16 +80,10 @@ h2 {
     margin: 0;
 }
 
-.calendar ul {
+.calendar x-event-list {
     list-style: none;
     text-align: left;
     padding: 0;
-}
-
-.calendar .date {
-    padding-top: 1em;
-    color: darkred;
-    font-size: 90%;
 }
 
 .group {
