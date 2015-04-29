@@ -20,7 +20,7 @@ init()
         if (date.isValid()) {
             date = date.utcOffset(0).endOf('day');
 
-            entry = new schema.CalendarEntry({
+            let entry = new schema.CalendarEntry({
                 date: date.toDate(),
                 show_to_groups: groups,
                 summary: summary
