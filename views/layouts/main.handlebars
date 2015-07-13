@@ -4,31 +4,26 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Student Sonar</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
         <!-- build:css -->
-        <link rel="stylesheet/less" href="css/style.less" shim-shadowdom />
-        <!-- endbuild -->
-        <!-- build:webcomponents -->
-        <script src="/jspm_packages/npm/webcomponents.js@0.5.3/webcomponents.min.js"></script>
-	<script src="/jspm_packages/github/distros/less@2.4.0/less.js"></script>
+        <link rel="stylesheet/less" href="/css/style.less">
+        <script src="/jspm_packages/github/distros/less@2.4.0/less.js"></script>
         <!-- endbuild -->
     </head>
     <body>
         {{#if user}}
-            <header>
+            <header id="#header">
                 <div>
                     <img src="{{user.avatar}}" width="36" height="36">
                     {{user.realName}}
                 </div>
 
-                <div>
-                    {{!--
-                    {{#if isAdmin}}
-                    <a href="/admin">Admin</a>
-                    {{/if}}
-                    --}}
-
-                    <a href="/logout">Log out</a>
-                </div>
+                <nav>
+                    <ul>
+                        {{#if isAdmin}}<li><a id="admin-link" href="/admin">Admin</a></li>{{/if}}
+                        <li><a href="/logout">Log out</a></li>
+                    </ul>
+                </nav>
             </header>
         {{/if}}
 

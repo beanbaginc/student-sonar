@@ -1,36 +1,6 @@
-<template id="x-student-card-template">
-    <img id="avatar">
-    <span id="name"></span>
-</template>
-
-<template id="x-student-view-template">
-    <div id="bio">
-        <h1 id="name"></h1>
-        <img id="avatar">
-        <h3 id="school"></h3>
-        <a id="email"></a>
-    </div>
-    <div id="details">
-    </div>
-</template>
-
-<template id="x-summary-entry-template">
-    <div id="title"></div>
-    <div id="content">
-        <content></content>
-    </div>
-</template>
-
-<template id="x-event-list-template">
-    <content></content>
-</template>
-
-<template id="x-event-day-template">
-    <div id="date"></div>
-    <ul>
-        <content></content>
-    </ul>
-</template>
+<div id="content">
+    <div id="spinner"><span class="fa fa-refresh fa-spin"></span></div>
+</div>
 
 <script>
     window.user = {{{userJSON}}};
@@ -40,6 +10,10 @@
 <script src="/jspm_packages/system.js"></script>
 <script src="/lib/frontend/config.js"></script>
 <script>
+    System.config({
+        baseURL: '/'
+    });
+
     System.import('lib/frontend/main')
         .catch(console.error.bind(console));
 </script>

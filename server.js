@@ -1,4 +1,5 @@
-let errorhandler = require('errorhandler'),
+let bodyParser = require('body-parser'),
+    errorhandler = require('errorhandler'),
     express = require('express'),
     handlebars = require('express-handlebars'),
     logger = require('morgan'),
@@ -45,6 +46,9 @@ init()
             saveUninitialized: true,
             secret: options.config.sessionSecret
         }));
+
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(bodyParser.json());
 
         app.use(passport.initialize());
         app.use(passport.session());

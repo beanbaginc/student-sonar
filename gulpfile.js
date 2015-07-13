@@ -18,14 +18,11 @@ gulp.task('html', function() {
         .pipe(htmlreplace({
             css: {
                 src: ['/css/style.min.css'],
-                tpl: '<link rel="stylesheet" href="%s" shim-shadowdom>',
+                tpl: '<link rel="stylesheet" href="%s">',
             },
             js: [
                 '/scripts/traceur-runtime.min.js',
                 '/scripts/build.min.js'
-            ],
-            webcomponents: [
-                '/scripts/webcomponents.min.js'
             ]
         }))
         .pipe(gulp.dest('build/views/'));
@@ -39,7 +36,6 @@ gulp.task('jspm-bundle', function() {
 gulp.task('javascript', function() {
     var scripts = {
             'jspm_packages/traceur-runtime.js': 'traceur-runtime',
-            'jspm_packages/npm/webcomponents.js@0.5.3/webcomponents.min.js': 'webcomponents',
             'lib/frontend/build.js': 'build'
         },
         src = [],
