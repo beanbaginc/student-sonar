@@ -11,22 +11,6 @@
         <!-- endbuild -->
     </head>
     <body>
-        {{#if user}}
-            <header id="#header">
-                <div>
-                    <img src="{{user.avatar}}" width="36" height="36">
-                    {{user.realName}}
-                </div>
-
-                <nav>
-                    <ul>
-                        {{#if isAdmin}}<li><a id="admin-link" href="/admin">Admin</a></li>{{/if}}
-                        <li><a href="/logout">Log out</a></li>
-                    </ul>
-                </nav>
-            </header>
-        {{/if}}
-
         {{{body}}}
     </body>
 </html>
