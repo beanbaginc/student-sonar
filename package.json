@@ -49,7 +49,9 @@
     },
     "dependencies": {
       "backbone": "^1.2.1",
+      "bootstrap": "^3.3.5",
       "cal-heatmap": "npm:cal-heatmap@^3.5.2",
+      "css": "npm:jspm-loader-css@^0.1.6",
       "d3": "^3.5.5",
       "fetch": "npm:whatwg-fetch@^0.7.0",
       "jquery": "^2.1.3",
