@@ -74,7 +74,7 @@ gulp.task('css', function() {
 
 gulp.task('images', function() {
     return gulp.src('images/*')
-        .pipe(image())
+        //.pipe(image())
         .pipe(gulp.dest('build/images/'));
 });
 
