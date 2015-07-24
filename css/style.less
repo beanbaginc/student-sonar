@@ -121,6 +121,14 @@ div.sidebar {
         }
     }
 
+    #groups .label {
+        margin-right: 0.5em;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
     ul {
         padding: 0;
     }
@@ -133,6 +141,17 @@ div.sidebar {
         padding-left: 2em;
         color: darkgrey;
         max-width: 40em;
+    }
+
+    .link-list .delete-button {
+        margin-right: 0.5em;
+    }
+
+    .editable-click.editable-disabled,
+    a.editable-click.editable-disabled,
+    a.editable-click.editable-disabled:hover {
+        color: #337AB7;
+        cursor: pointer;
     }
 }
 
@@ -192,6 +211,21 @@ div.sidebar {
             padding: 0;
             list-style: none;
         }
+    }
+}
+
+.editable-link {
+    display: block;
+    margin-bottom: 5px;
+
+    span {
+        width: 70px;
+        display: inline-block;
+    }
+
+    input {
+        font-weight: normal;
+        width: 20em;
     }
 }
 
