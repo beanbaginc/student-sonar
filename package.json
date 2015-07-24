@@ -53,6 +53,7 @@
       "bootstrap-tagsinput": "github:timschlechter/bootstrap-tagsinput@^0.5.0",
       "bootstrap-toggle": "github:minhur/bootstrap-toggle@^2.2.0",
       "cal-heatmap": "npm:cal-heatmap@^3.5.2",
+      "clean-css": "npm:clean-css@^3.3.6",
       "css": "npm:jspm-loader-css@^0.1.6",
       "d3": "^3.5.5",
       "fetch": "npm:whatwg-fetch@^0.7.0",
