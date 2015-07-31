@@ -1,10 +1,12 @@
+@header-height: 51px;
+
 .content {
-    padding-top: 51px;
+    padding-top: @header-height;
 }
 
 div.sidebar {
     position: fixed;
-    top: 51px;
+    top: @header-height;
     bottom: 0;
     left: 0;
     z-index: 1000;
@@ -52,13 +54,48 @@ div.sidebar {
 
 .main {
     position: fixed;
-    top: 51px;
+    top: @header-height;
     bottom: 0;
     right: 0;
     left: 0;
     display: block;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+.content-inner {
+    margin: 2em;
+}
+
+.my-status-reports {
+    .list-group-item span {
+        float: right;
+    }
+}
+
+.status-report-editor {
+    height: 100%;
+    padding-bottom: @header-height;
+
+    .panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .save-status {
+            margin-left: 1em;
+        }
+
+        .panel-heading,
+        .panel-footer {
+            flex: 0 0 auto;
+        }
+
+        .editor-container {
+            flex: 1 1 auto;
+            overflow: hidden;
+        }
+    }
 }
 
 .summary-entry {
@@ -226,6 +263,37 @@ div.sidebar {
     input {
         font-weight: normal;
         width: 20em;
+    }
+}
+
+.all-status-reports {
+    #delete-button {
+        margin-left: 4px;
+    }
+
+    #groups {
+        display: inline-block;
+        // TODO: link in bootstrap variables.less and use @font-size-base
+        min-height: 14px;
+        min-width: 4em;
+
+        .label {
+            margin-right: 4px;
+        }
+    }
+
+    .avatars {
+        padding: 2px;
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            margin: 2px;
+        }
+    }
+
+    .date-column {
+        width: 250px;
     }
 }
 
