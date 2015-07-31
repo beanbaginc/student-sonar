@@ -21,7 +21,6 @@ gulp.task('html', function() {
                 tpl: '<link rel="stylesheet" href="%s">',
             },
             js: [
-                '/scripts/traceur-runtime.min.js',
                 '/scripts/build.min.js'
             ]
         }))
