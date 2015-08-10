@@ -34,7 +34,6 @@ gulp.task('jspm-bundle', function() {
 
 gulp.task('javascript', function() {
     var scripts = {
-            'jspm_packages/traceur-runtime.js': 'traceur-runtime',
             'lib/frontend/build.js': 'build'
         },
         src = [],
@@ -58,7 +57,7 @@ gulp.task('javascript', function() {
 });
 
 gulp.task('sourcemaps', function() {
-    return gulp.src(['jspm_packages/traceur-runtime.js.map', 'lib/frontend/build.js.map'])
+    return gulp.src('lib/frontend/build.js.map')
         .pipe(gulp.dest('build/scripts/'));
 });
 
@@ -71,6 +70,18 @@ gulp.task('css', function() {
         .pipe(gulp.dest('build/css/'));
 });
 
+gulp.task('preview-css', function() {
+    /*
+     * This covers the "preview" CSS for EpicEditor, which is currently just
+     * the bootstrap base with some slight customizations. It would be nice to
+     * get rid of this entirely and just replace it with a link to the
+     * bootstrap base on a CDN.
+     */
+    return gulp.src('css/preview.css')
+        .pipe(minifycss())
+        .pipe(gulp.dest('build/css/'));
+});
+
 gulp.task('images', function() {
     return gulp.src('images/*')
         //.pipe(image())
@@ -78,5 +89,5 @@ gulp.task('images', function() {
 });
 
 gulp.task('default', ['clean', 'jspm-bundle'], function() {
-    gulp.start('html', 'javascript', 'sourcemaps', 'css', 'images');
+    gulp.start('html', 'javascript', 'sourcemaps', 'css', 'preview-css', 'images');
 });
