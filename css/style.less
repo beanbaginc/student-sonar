@@ -67,6 +67,16 @@ div.sidebar {
     margin: 2em;
 }
 
+.tags {
+    .label {
+        margin-right: 3px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+}
+
 .my-status-reports {
     .list-group-item span {
         float: right;
@@ -189,6 +199,63 @@ div.sidebar {
     a.editable-click.editable-disabled:hover {
         color: #337AB7;
         cursor: pointer;
+    }
+}
+
+.student-projects {
+    #ideas {
+        .page-header {
+            margin: 0;
+        }
+
+        .assignee {
+            vertical-align: text-bottom;
+            width: 28px;
+            height: 28px;
+        }
+
+        .tags {
+            margin-bottom: 10px;
+        }
+
+        section {
+            margin: 0 0 3em 0;
+        }
+
+        ol, ul {
+            margin: 1em 0 2em 0;
+        }
+    }
+
+    #ideas-nav-container {
+        padding-top: 10px;
+
+        .nav {
+            li {
+                a {
+                    padding: 4px 10px;
+                    font-size: 13px;
+                    font-weight: 500;
+                }
+
+                &.active a {
+                    font-weight: 700;
+                }
+            }
+
+            .nav {
+                li {
+                    a {
+                        font-weight: 400;
+                        padding-left: 30px;
+                    }
+
+                    &.active a {
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
     }
 }
 

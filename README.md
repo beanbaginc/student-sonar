@@ -12,9 +12,15 @@ You'll also need to create a `config.json` file that defines all the different
 API keys and hostnames for things. Talk to David if you need some secrets.
 ```javascript
 {
+    "asanaAPIKey": "",
+    "asanaWorkspaceID": "",
+    "asanaStudentProjectsID": "",
     "awsAccessKeyId": "",
     "awsRegion": "",
     "awsSecretAccessKey": "",
+    "memcachedPassword": "",
+    "memcachedServers": "",
+    "memcachedUsername": "",
     "mongodbURI": "",
     "port": 8001,
     "reviewboardAPIToken": "",

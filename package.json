@@ -13,6 +13,7 @@
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
   "dependencies": {
+    "asana": "^0.9.1",
     "aws-sdk": "^2.1.8",
     "babel": "^5.1.11",
     "body-parser": "^1.13.1",
@@ -34,6 +35,7 @@
     "gulp-shell": "^0.3.0",
     "jspm": "^0.15.7",
     "lodash": "^3.10.0",
+    "memjs": "^0.8.6",
     "moment": "^2.9.0",
     "mongoose": "^4.0.1",
     "morgan": "^1.5.2",
