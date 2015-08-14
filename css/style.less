@@ -195,7 +195,20 @@ div.sidebar {
 }
 
 .student-projects {
+    height: 100%;
+
+    .row {
+        height: 100%;
+    }
+
+    #ideas-container {
+        height: 100%;
+        overflow-y: scroll;
+    }
+
     #ideas {
+        position: relative;
+
         .page-header {
             margin: 0;
         }
@@ -220,18 +233,31 @@ div.sidebar {
     }
 
     #ideas-nav-container {
+        height: 100%;
+        overflow-y: scroll;
         padding-top: 10px;
+
+        // TODO: import bootstrap defs and use primary color from there.
+        @color-muted: #333;
+        @color-primary: #337ab7;
 
         .nav {
             li {
                 a {
-                    padding: 4px 10px;
                     font-size: 13px;
                     font-weight: 500;
+                    padding: 4px 10px 4px 13px;
+                    color: @color-muted;
+
+                    &:focus {
+                        background-color: transparent;
+                    }
                 }
 
-                &.active a {
-                    font-weight: 700;
+                &.active > a {
+                    border-left: 3px @color-primary solid;
+                    padding-left: 10px;
+                    color: @color-primary;
                 }
             }
 
@@ -239,11 +265,11 @@ div.sidebar {
                 li {
                     a {
                         font-weight: 400;
-                        padding-left: 30px;
+                        padding-left: 33px;
                     }
 
-                    &.active a {
-                        font-weight: 500;
+                    &.active > a {
+                        padding-left: 30px;
                     }
                 }
             }
