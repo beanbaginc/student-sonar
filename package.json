@@ -39,6 +39,7 @@
     "moment": "^2.9.0",
     "mongoose": "^4.0.1",
     "morgan": "^1.5.2",
+    "newrelic": "1.24.0",
     "node-fetch": "^1.0.3",
     "passport": "^0.2.1",
     "passport-slack": "0.0.1",

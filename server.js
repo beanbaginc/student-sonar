@@ -1,14 +1,21 @@
-let bodyParser = require('body-parser'),
-    errorhandler = require('errorhandler'),
-    express = require('express'),
-    handlebars = require('express-handlebars'),
-    logger = require('morgan'),
-    passport = require('passport'),
-    Q = require('q'),
-    session = require('express-session'),
-    MongoStore = require('connect-mongo')(session),
-    routes = require('./lib/routes'),
-    init = require('./lib/init');
+const production = (process.env.NODE_ENV === 'production');
+
+if (production) {
+    require('newrelic');
+}
+
+
+const bodyParser = require('body-parser'),
+      errorhandler = require('errorhandler'),
+      express = require('express'),
+      handlebars = require('express-handlebars'),
+      logger = require('morgan'),
+      passport = require('passport'),
+      Q = require('q'),
+      session = require('express-session'),
+      MongoStore = require('connect-mongo')(session),
+      routes = require('./lib/routes'),
+      init = require('./lib/init');
 
 init()
     .then(function(options) {
@@ -19,7 +26,7 @@ init()
 
         let app = express();
 
-        if (app.get('env') === 'production') {
+        if (production) {
             app.use('/css', express.static('build/css'));
             app.use('/images', express.static('build/images'));
             app.use('/scripts', express.static('build/scripts'));
