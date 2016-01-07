@@ -191,6 +191,16 @@ div.sidebar {
         min-width: 20em;
     }
 
+    // Normally, inline x-editables use inline-block, but we want the notes
+    // field to fill the full width available to it.
+    .notes .editable-inline {
+        display: block;
+
+        .form-group, .editable-input {
+            display: block;
+        }
+    }
+
     .timeline-details {
         padding-left: 2em;
         color: darkgrey;
