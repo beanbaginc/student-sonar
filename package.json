@@ -13,7 +13,7 @@
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
   "dependencies": {
-    "asana": "^0.9.1",
+    "asana": "0.15.0",
     "aws-sdk": "2.2.29",
     "babel": "5.8.34",
     "body-parser": "1.14.2",
