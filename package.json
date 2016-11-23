@@ -34,7 +34,7 @@
     "gulp-rename": "^1.2.0",
     "gulp-shell": "^0.3.0",
     "jspm": "^0.15.7",
-    "lodash": "^3.10.0",
+    "lodash": "4.17.2",
     "memjs": "0.8.9",
     "moment": "2.11.1",
     "mongoose": "4.3.4",
