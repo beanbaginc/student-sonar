@@ -8,7 +8,6 @@ if (production) {
 const bodyParser = require('body-parser'),
       errorhandler = require('errorhandler'),
       express = require('express'),
-      handlebars = require('express-handlebars'),
       logger = require('morgan'),
       passport = require('passport'),
       Q = require('q'),
@@ -19,29 +18,13 @@ const bodyParser = require('body-parser'),
 
 init()
     .then(function(options) {
-        let handlebarsOptions = {
-            defaultLayout: 'main',
-            compilerOptions: {}
-        };
-
         let app = express();
+        app.use('/scripts', express.static('build/scripts'));
 
         if (production) {
-            app.use('/css', express.static('build/css'));
             app.use('/images', express.static('build/images'));
-            app.use('/scripts', express.static('build/scripts'));
-
-            let viewsDir = process.cwd() + '/build/views';
-            app.set('views', viewsDir);
-
-            handlebarsOptions.layoutsDir = viewsDir + '/layouts';
-            handlebarsOptions.partialsDir = viewsDir + '/partials';
         } else {
-            app.use('/css', express.static('css'));
             app.use('/images', express.static('images'));
-            app.use('/lib', express.static('lib'));
-            app.use('/jspm_packages', express.static('jspm_packages'));
-
             app.use(errorhandler());
         }
 
@@ -64,9 +47,6 @@ init()
         app.use(passport.session());
 
         app.use(logger('combined'));
-
-        app.engine('handlebars', handlebars(handlebarsOptions));
-        app.set('view engine', 'handlebars');
 
         app.use('/', routes(options));
 

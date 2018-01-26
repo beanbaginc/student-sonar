@@ -4,26 +4,39 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/.bin/babel-node server.js",
-    "postinstall": "jspm install && gulp"
+    "start": "./node_modules/.bin/babel-node --presets env --plugins dedent server.js",
+    "postinstall": "./node_modules/.bin/gulp",
+    "webpack": "./node_modules/.bin/webpack"
   },
   "engines": {
-    "node": "5.4.0"
+    "node": "8.9.1"
   },
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
   "dependencies": {
     "asana": "0.15.0",
     "aws-sdk": "2.2.29",
-    "babel": "5.8.34",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-dedent": "^2.0.0",
+    "babel-preset-env": "^1.6.1",
+    "backbone": "^1.3.3",
     "body-parser": "1.14.2",
+    "bootstrap": "^3.3.7",
+    "bootstrap-datepicker": "^1.7.1",
+    "bootstrap-toggle": "^2.2.2",
+    "cal-heatmap": "^3.6.2",
     "connect-mongo": "^0.8.0",
+    "css-element-queries": "^1.0.1",
+    "css-loader": "^0.28.9",
     "del": "^1.1.1",
+    "epiceditor": "^0.2.0",
     "errorhandler": "^1.3.5",
     "express": "^4.11.1",
-    "express-handlebars": "^2.0.0",
     "express-restify-mongoose": "1.1.2",
     "express-session": "1.13.0",
+    "file-loader": "^1.1.6",
     "gulp": "^3.8.11",
     "gulp-autoprefixer": "^2.1.0",
     "gulp-html-replace": "1.5.5",
@@ -33,7 +46,9 @@
     "gulp-notify": "^2.2.0",
     "gulp-rename": "^1.2.0",
     "gulp-shell": "^0.3.0",
+    "jquery": "^3.3.1",
     "jspm": "^0.15.7",
+    "less-loader": "^4.0.5",
     "lodash": "4.17.2",
     "memjs": "0.8.9",
     "moment": "2.11.1",
@@ -41,44 +56,17 @@
     "morgan": "^1.5.2",
     "newrelic": "1.24.0",
     "node-fetch": "^1.0.3",
+    "node-sass": "^4.7.2",
     "passport": "^0.2.1",
     "passport-slack": "0.0.1",
-    "q": "^1.1.2"
-  },
-  "jspm": {
-    "directories": {
-      "baseURL": "lib/frontend",
-      "packages": "jspm_packages"
-    },
-    "dependencies": {
-      "backbone": "npm:backbone@^1.2.1",
-      "bootstrap": "github:twbs/bootstrap@^3.3.5",
-      "bootstrap-datepicker": "npm:bootstrap-datepicker@^1.4.0",
-      "bootstrap-toggle": "github:minhur/bootstrap-toggle@^2.2.0",
-      "cal-heatmap": "npm:cal-heatmap@^3.5.2",
-      "clean-css": "npm:clean-css@^3.3.7",
-      "css": "npm:jspm-loader-css@^0.1.6",
-      "css-element-queries": "npm:css-element-queries@^0.3.0",
-      "d3": "github:mbostock/d3@^3.5.6",
-      "epic-editor": "github:OscarGodson/EpicEditor@^0.2.3",
-      "fetch": "npm:whatwg-fetch@^0.9.0",
-      "jquery": "github:components/jquery@^2.1.4",
-      "less": "github:aaike/jspm-less-plugin@^0.0.5",
-      "marked": "npm:marked@^0.3.5",
-      "moment": "github:moment/moment@^2.10.6",
-      "selectize": "github:brianreavis/selectize.js@^0.12.1",
-      "underscore": "npm:underscore@^1.8.3",
-      "x-editable": "github:vitalets/x-editable@^1.5.1"
-    },
-    "devDependencies": {
-      "babel": "npm:babel-core@^5.1.13",
-      "babel-runtime": "npm:babel-runtime@^5.1.13",
-      "core-js": "npm:core-js@^0.9.4"
-    },
-    "overrides": {
-      "npm:bootstrap-datepicker@1.4.0": {
-        "main": "js/bootstrap-datepicker.js"
-      }
-    }
+    "q": "^1.1.2",
+    "sass-loader": "^6.0.6",
+    "selectize": "^0.12.4",
+    "style-loader": "^0.19.1",
+    "underscore": "^1.8.3",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.10.0",
+    "webpack-stream": "^4.0.0",
+    "x-editable": "^1.5.1"
   }
 }

@@ -7,10 +7,11 @@ var fs = require('fs'),
     less = require('gulp-less'),
     minifycss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
-    shell = require('gulp-shell');
+    shell = require('gulp-shell'),
+    webpack = require('webpack-stream');
 
 gulp.task('clean', function(cb) {
-    del(['build', 'lib/frontend/build.js', 'lib/frontend.build.js.map'], cb);
+    del(['build'], cb);
 });
 
 gulp.task('html', function() {
@@ -27,37 +28,9 @@ gulp.task('html', function() {
         .pipe(gulp.dest('build/views/'));
 });
 
-gulp.task('jspm-bundle', function() {
+gulp.task('webpack', function() {
     return gulp.src('lib/frontend/main.js', { read: false })
-        .pipe(shell('jspm bundle-sfx main --minify'));
-});
-
-gulp.task('javascript', function() {
-    var scripts = {
-            'lib/frontend/build.js': 'build'
-        },
-        src = [],
-        key;
-
-    for (key in scripts) {
-        if (scripts.hasOwnProperty(key)) {
-            src.push(key);
-        }
-    }
-
-    return gulp.src(src, { base: './' })
-        .pipe(rename(function(path) {
-            var srcFilename = path.dirname + '/' + path.basename + path.extname,
-                destFilename = scripts[srcFilename];
-
-            path.dirname = '';
-            path.basename = destFilename + '.min';
-        }))
-        .pipe(gulp.dest('build/scripts/'));
-});
-
-gulp.task('sourcemaps', function() {
-    return gulp.src('lib/frontend/build.js.map')
+        .pipe(webpack(require('./webpack.config.js')))
         .pipe(gulp.dest('build/scripts/'));
 });
 
@@ -88,6 +61,6 @@ gulp.task('images', function() {
         .pipe(gulp.dest('build/images/'));
 });
 
-gulp.task('default', ['clean', 'jspm-bundle'], function() {
-    gulp.start('html', 'javascript', 'sourcemaps', 'css', 'preview-css', 'images');
+gulp.task('default', ['clean'], function() {
+    gulp.start('html', 'webpack', 'css', 'preview-css', 'images');
 });
