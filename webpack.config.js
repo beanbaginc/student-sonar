@@ -15,7 +15,7 @@ module.exports = {
                 loader: 'babel-loader',
                 query: {
                     cacheDirectory: 'babel-cache',
-                    presets: ['env'],
+                    presets: ['react', 'env'],
                 },
             },
             {
@@ -54,4 +54,7 @@ module.exports = {
         }),
         new webpack.optimize.OccurrenceOrderPlugin(),
     ],
+    resolve: {
+        extensions: ['.js', '.jsx'],
+    },
 };
