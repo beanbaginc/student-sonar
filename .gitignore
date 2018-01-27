@@ -1,7 +1,6 @@
-*.egg-info
-*.pyc
 *.swp
 babel-cache
 build
 config.json
+newrelic_agent.log
 node_modules
