@@ -61,6 +61,7 @@
     "passport-slack": "0.0.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-router-dom": "^4.2.2",
     "sass-loader": "^6.0.6",
     "selectize": "^0.12.4",
     "style-loader": "^0.19.1",
