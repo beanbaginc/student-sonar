@@ -1,6 +1,23 @@
 const webpack = require('webpack');
 const path = require('path');
 
+const plugins = [
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+    }),
+    new webpack.ProvidePlugin({
+        'jQuery': 'jquery',
+        '$': 'jquery',
+        'window.jQuery': 'jquery',
+        'window.$': 'jquery',
+    }),
+    new webpack.optimize.OccurrenceOrderPlugin(),
+];
+
+if (process.env.NODE_ENV === 'production') {
+    plugins.push(new webpack.optimize.UglifyJsPlugin());
+}
+
 module.exports = {
     entry: path.join(__dirname, 'lib', 'frontend', 'main.js'),
     output: {
@@ -42,18 +59,7 @@ module.exports = {
             },
         ],
     },
-    plugins: [
-        new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-        }),
-        new webpack.ProvidePlugin({
-            'jQuery': 'jquery',
-            '$': 'jquery',
-            'window.jQuery': 'jquery',
-            'window.$': 'jquery',
-        }),
-        new webpack.optimize.OccurrenceOrderPlugin(),
-    ],
+    plugins: plugins,
     resolve: {
         extensions: ['.js', '.jsx'],
     },
