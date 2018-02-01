@@ -234,15 +234,14 @@ html, body, .root {
     }
 }
 
-.student-projects {
+.project-list {
+    display: grid;
     height: 100%;
-
-    .row {
-        height: 100%;
-    }
+    grid-template-columns: auto 300px;
+    grid-template-areas: "project-list-ideas project-list-nav";
 
     #ideas-container {
-        height: 100%;
+        grid-area: project-list-ideas;
         overflow-y: scroll;
     }
 
@@ -254,6 +253,7 @@ html, body, .root {
         }
 
         .assignee {
+            margin-left: 6px;
             vertical-align: text-bottom;
             width: 28px;
             height: 28px;
@@ -273,7 +273,7 @@ html, body, .root {
     }
 
     #ideas-nav-container {
-        height: 100%;
+        grid-area: project-list-nav;
         overflow-y: scroll;
 
         // TODO: import bootstrap defs and use primary color from there.

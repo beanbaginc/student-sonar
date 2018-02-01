@@ -1,9 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 
-import ReadyView from './ready-view';
 import Project from './project';
 import ScrollSpy from './scrollspy';
 
@@ -34,17 +32,27 @@ const ProjectSection = ({ id, name, tasks }) => (
 );
 
 
-export default class StudentProjectsListView extends ReadyView {
-    constructor(options) {
-        options = Object.create(options);
-        options.className = 'student-projects';
-        super(options);
-
-        this.model.get('projects').fetch().then(() => this.render());
+export default class ProjectList extends React.Component {
+    constructor(props) {
+        super(props);
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    _render() {
-        const sections = this.model.get('projects').map(section => ({
+    componentDidMount() {
+        this.props.model.on('ready', this.handleChange);
+        this.props.model.get('projects').fetch().then(this.handleChange);
+    }
+
+    componentWillUnmount() {
+        this.props.model.off('ready', this.handleChange);
+    }
+
+    handleChange() {
+        this.forceUpdate();
+    }
+
+    render() {
+        const sections = this.props.model.get('projects').map(section => ({
             id: section.get('id'),
             name: section.get('name'),
             tasks: section.get('tasks')
@@ -59,26 +67,26 @@ export default class StudentProjectsListView extends ReadyView {
                 })),
         }));
 
-        ReactDOM.render(
+        return (
             <ScrollSpy
-                className="row"
+                className="project-list"
                 content="#ideas-container"
                 nav="#ideas-nav">
-                <div className="col-lg-8" id="ideas-container">
-                    <div className="content-inner" id="ideas">
+                <div className="content-inner" id="ideas-container">
+                    <div id="ideas">
                         {sections.map(section =>
                             <ProjectSection key={section.id} {...section} />
                         )}
                     </div>
                 </div>
-                <nav className="col-lg-4" id="ideas-nav-container">
+                <nav id="ideas-nav-container">
                     <ul className="nav" id="ideas-nav">
                         {sections.map(section =>
                             <NavSection key={section.id} {...section} />
                         )}
                     </ul>
                 </nav>
-            </ScrollSpy>,
-            this.$el[0]);
+            </ScrollSpy>
+        );
     }
 }
