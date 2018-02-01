@@ -1,11 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Router, NavLink } from 'react-router-dom';
-import { createBrowserHistory } from 'history';
-
-import ReadyView from './ready-view';
+import { NavLink } from 'react-router-dom';
 
 
 class SidebarItem extends React.Component {
@@ -46,28 +42,22 @@ class SidebarItem extends React.Component {
 }
 
 
-export default class SidebarView extends ReadyView {
-    constructor(options) {
-        options = Object.create(options);
-        super(options);
+export default class Sidebar extends React.Component {
+    constructor(props) {
+        super(props);
 
-        this.history = createBrowserHistory();
-        // TODO: This reflects any changes from Backbone.Router into the
-        // react-router history. It's kind of a terrible thing, but it's
-        // temporary. Get rid of it once we're moved away from Backbone.Router.
-        this.model.on('route', () => this.history.replace(document.location.pathname));
+        props.model.on('ready', () => this.forceUpdate());
     }
 
-    _render() {
-        const loggedIn = (window.userId !== null);
-        const isMentor = (window.userType === 'mentor');
+    render() {
+        const { loggedIn, isMentor, model } = this.props;
 
         let myStudentsItems = [];
         let groupsItems = null;
 
         if (isMentor) {
-            const allUsers = this.model.get('users');
-            const groups = this.model.get('groups')
+            const allUsers = model.get('users');
+            const groups = model.get('groups')
                 .filter(group => group.get('show'));
 
             groupsItems = groups.map(group => {
@@ -106,8 +96,8 @@ export default class SidebarView extends ReadyView {
             });
         }
 
-        ReactDOM.render(
-            <Router history={this.history}>
+        return (
+            <div className="sidebar">
                 <ul className="nav nav-sidebar">
                     <SidebarItem to="/projects" label="Project Ideas" />
                     {loggedIn && <SidebarItem to="/calendar" label="Calendar" />}
@@ -124,7 +114,7 @@ export default class SidebarView extends ReadyView {
                     {groupsItems}
                     {isMentor && <SidebarItem to="/users" label="All Users" />}
                 </ul>
-            </Router>,
-            this.$el[0]);
+            </div>
+        );
     }
 }
