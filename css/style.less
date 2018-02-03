@@ -384,30 +384,53 @@ html, body, .root {
     }
 }
 
+// Bootstrap datepicker (at least through 1.7.1) has an incompatibility with
+// jQuery 3.x, where the body isn't shown. This overrides the built-in CSS to
+// handle it correctly.
+.datepicker > div {
+    display: block;
+}
+
 .all-status-reports {
+    position: relative;
+
     #delete-button {
         margin-left: 4px;
     }
 
-    #groups {
+    .tags {
         display: inline-block;
         // TODO: link in bootstrap variables.less and use @font-size-base
         min-height: 14px;
         min-width: 4em;
+
     }
 
     .avatars {
+        width: 1%;
         padding: 2px;
+
+        > div {
+            white-space: nowrap;
+        }
 
         .avatar {
             width: 30px;
             height: 30px;
             margin: 2px;
+
+            &.faded {
+                opacity: 0.2;
+            }
         }
     }
 
     .date-column {
         width: 250px;
+    }
+
+    .selectize-input {
+        min-width: 20em;
     }
 }
 
