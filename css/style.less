@@ -90,26 +90,68 @@ html, body, .root {
 
 .status-report-editor {
     height: 100%;
-    padding-bottom: @header-height;
+    padding: 2em;
 
     .panel {
-        display: flex;
-        flex-direction: column;
+        display: grid;
         height: 100%;
+        grid-template-columns: auto;
+        grid-template-rows: min-content auto;
+        grid-template-areas:
+            "editor-header"
+            "editor-body";
+    }
 
-        .save-status {
-            margin-left: 1em;
-        }
+    .panel-heading {
+        align-items: center;
+        display: flex;
+        grid-area: editor-header;
 
-        .panel-heading,
-        .panel-footer {
-            flex: 0 0 auto;
-        }
+        > * {
+            margin: 0 5px;
 
-        .editor-container {
-            flex: 1 1 auto;
-            overflow: hidden;
+            &:first-child {
+                flex-grow: 1;
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
         }
+    }
+
+    .editor-container {
+        grid-area: editor-body;
+        overflow-y: hidden;
+    }
+
+    .react-mde {
+        overflow-y: hidden;
+    }
+
+    .mde-preview {
+        height: 100%;
+        overflow-y: scroll;
+    }
+
+    .react-mde, .mde-text, .mde-text textarea {
+        height: 100%;
+    }
+
+    .mde-text textarea {
+        background-color: rgb(41, 41, 41);
+        border: none;
+        border-radius: 0 0 4px 4px;
+        color: #ddd;
+        font-family: monospace;
+        padding: 0 0.5rem;
+        resize: none;
+    }
+
+    .mde-preview .mde-preview-content {
+        border: none;
+        margin-top: 0;
     }
 }
 

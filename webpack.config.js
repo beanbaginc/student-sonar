@@ -33,6 +33,7 @@ module.exports = {
                 query: {
                     cacheDirectory: 'babel-cache',
                     presets: ['react', 'env'],
+                    plugins: ['transform-class-properties', 'dedent'],
                 },
             },
             {
@@ -59,6 +60,7 @@ module.exports = {
             },
         ],
     },
+    devtool: 'eval-source-map',
     plugins: plugins,
     resolve: {
         extensions: ['.js', '.jsx'],

@@ -48,13 +48,11 @@ class RowView extends React.Component {
                 }
             })
             .on('shown', () => {
-                console.log('shown', this.$deleteButton);
                 if (this.$deleteButton) {
                     this.$deleteButton.hide();
                 }
             })
             .on('hidden', () => {
-                console.log('hidden', this.$deleteButton);
                 if (this.$deleteButton) {
                     this.$deleteButton.show();
                 }
