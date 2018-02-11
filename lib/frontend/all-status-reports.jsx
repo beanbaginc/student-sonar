@@ -5,6 +5,7 @@ import moment from 'moment';
 import { NavLink } from 'react-router-dom';
 
 import Confirm from './confirm';
+import Editable from './editable';
 import {intersectionExists} from './util';
 
 
@@ -31,66 +32,10 @@ class RowView extends React.Component {
 
     componentDidMount() {
         this.props.model.on('change', this.handleChange);
-
-        this.$date
-            .editable({
-                display: value => value.format('YYYY-MM-DD'),
-                format: 'YYYY-MM-DD',
-                mode: 'inline',
-                savenochange: true,
-                success: (response, newValue) => this.props.onDateChanged(newValue),
-                type: 'datepicker',
-                unsavedclass: null,
-                datepicker: {
-                    container: '.all-status-reports',
-                }
-            })
-            .on('shown', () => {
-                if (this.$deleteButton) {
-                    this.$deleteButton.hide();
-                }
-            })
-            .on('hidden', () => {
-                if (this.$deleteButton) {
-                    this.$deleteButton.show();
-                }
-            })
-
-        this.$groups
-            .editable({
-                display: false,
-                mode: 'inline',
-                selectize: {
-                    create: true,
-                    delimiter: ',',
-                    options: this.props.getGroups().pluck('group_id').map(
-                        group => ({ text: group, value: group })),
-                    plugins: ['remove_button'],
-                },
-                success: (response, newValue) => this.props.onGroupsChanged(
-                    new Set(newValue.split(','))),
-                type: 'selectize',
-                unsavedclass: null,
-                value: this.props.getGroupsString(),
-            });
-
-        if (!this.props.manage) {
-            this.$date.editable('disable');
-            this.$groups.editable('disable');
-        }
     }
 
     componentWillUnmount() {
         this.props.model.off('change', this.handleChange);
-
-        this.$date.editable('destroy');
-        this.$groups.editable('destroy');
-    }
-
-    componentWillReceiveProps(nextProps) {
-        const enableEditors = nextProps.manage ? 'enable' : 'disable';
-        this.$date.editable(enableEditors);
-        this.$groups.editable(enableEditors);
     }
 
     handleChange() {
@@ -118,32 +63,65 @@ class RowView extends React.Component {
         const showToGroups = model.get('show_to_groups');
         const missing = !!users.find(user => user.report === undefined);
 
+        const dateEditableOptions = {
+            disabled: !manage,
+            display: value => value.format('YYYY-MM-DD'),
+            format: 'YYYY-MM-DD',
+            mode: 'inline',
+            savenochange: true,
+            type: 'datepicker',
+            datepicker: {
+                container: '.all-status-reports',
+            },
+            unsavedclass: null,
+        };
+
+        const groupsEditableOptions = {
+            disabled: !manage,
+            display: false,
+            mode: 'inline',
+            type: 'selectize',
+            selectize: {
+                create: true,
+                delimiter: ',',
+                options: this.props.getGroups().pluck('group_id').map(
+                    group => ({ text: group, value: group })),
+                plugins: ['remove_button'],
+            },
+            unsavedclass: null,
+            value: this.props.getGroupsString(),
+        };
+
         return (
             <tr className={date < moment() ? (missing > 0 ? 'danger' : 'success') : null}>
                 <td className="date-column">
-                    <time id="date" ref={el => this.$date = el ? $(el) : null}>
+                    <Editable
+                        options={dateEditableOptions}
+                        onChange={value => this.props.onDateChanged(value)}
+                        onShow={() => this.$deleteButton.hide()}
+                        onHide={() => this.$deleteButton.show()}>
                         {date.format('YYYY-MM-DD')}
-                    </time>
+                    </Editable>
                     {manage && (
                         <button
                             type="button"
                             id="delete-button"
                             className="btn btn-default btn-xs"
                             onClick={this.onDeleteClicked}
-                            ref={el => this.$deleteButton = el ? $(el) : null}>
+                            ref={el => this.$deleteButton = el ? $(el) : $()}>
                             <span className="fa fa-trash-o"></span>
                         </button>
                     )}
                 </td>
                 <td>
-                    <span
+                    <Editable
                         className="tags"
-                        id="groups"
-                        ref={el => this.$groups = el ? $(el) : null}>
+                        options={groupsEditableOptions}
+                        onChange={value => this.props.onGroupsChanged(new Set(value.split(',')))}>
                         {[...showToGroups].map(group => (
                             <span key={group} className="label label-default">{group}</span>
                         ))}
-                    </span>
+                    </Editable>
                 </td>
                 <td className="avatars">
                     <div>
