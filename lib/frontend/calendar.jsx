@@ -3,8 +3,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-import 'bootstrap';
-import 'selectize';
 
 import Confirm from './confirm';
 import {CalendarItem} from './models';

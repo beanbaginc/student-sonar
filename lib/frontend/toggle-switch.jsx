@@ -1,7 +1,6 @@
 // jshint ignore: start
 
 import React from 'react';
-import 'bootstrap-toggle';
 
 
 export default class ToggleSwitch extends React.Component {

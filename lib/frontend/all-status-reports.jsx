@@ -6,8 +6,6 @@ import { NavLink } from 'react-router-dom';
 
 import Confirm from './confirm';
 import {intersectionExists} from './util';
-import './editable-datepicker';
-import './editable-selectize';
 
 
 class RowView extends React.Component {

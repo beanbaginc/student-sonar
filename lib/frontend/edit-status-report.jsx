@@ -3,7 +3,6 @@
 import moment from 'moment';
 import React from 'react';
 import ReactMDE from 'react-mde';
-import 'react-mde/lib/styles/css/react-mde-all.css';
 
 import ToggleSwitch from './toggle-switch';
 import * as models from './models';
