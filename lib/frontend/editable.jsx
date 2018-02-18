@@ -18,7 +18,8 @@ export default class Editable extends React.Component {
         this.$el
             .editable(options)
             .on('shown', this.props.onShow)
-            .on('hidden', this.props.onHide);
+            .on('hidden', this.props.onHide)
+            .on('init', this.props.onInit);
     }
 
     componentWillUnmount() {
@@ -31,11 +32,16 @@ export default class Editable extends React.Component {
                 ? 'disable'
                 : 'enable');
         }
+
+        if (prevProps.options.value !== this.props.options.value) {
+            this.$el.editable('setValue', this.props.options.value);
+        }
     }
 
     render() {
         return (
-            <span ref={el => this.$el = el ? $(el) : $()}>
+            <span
+                ref={el => this.$el = el ? $(el) : $()}>
                 {this.props.children}
             </span>
         );
