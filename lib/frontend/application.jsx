@@ -1,11 +1,6 @@
 // jshint ignore: start
 
-import Backbone from 'backbone';
-
-
-// new
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import AllStatusReports from './all-status-reports';
@@ -39,34 +34,25 @@ const PermissionDenied = props => (
 );
 
 
-/*
- * ApplicationView is a view that wraps the entire application. It shows a
- * header, and then shows different sub-views for each page.
- */
-export default class ApplicationView extends Backbone.View {
-    constructor(options) {
-        options = Object.create(options);
-        options.className = 'root';
-        super(options);
-    }
-
+export default class Application extends React.Component {
     render() {
+        const { model } = this.props;
         const loggedIn = (window.userId !== null);
         const isMentor = (window.userType === 'mentor');
 
-        ReactDOM.render(
+        return (
             <BrowserRouter>
                 <React.Fragment>
                     <Header
                         loggedIn={loggedIn}
                         isMentor={isMentor}
-                        manage={this.model.get('manage')}
-                        onManageChanged={manage => this.model.set({ manage })}
+                        manage={model.get('manage')}
+                        onManageChanged={manage => model.set({ manage })}
                     />
                     <Sidebar
                         loggedIn={loggedIn}
                         isMentor={isMentor}
-                        model={this.model}
+                        model={model}
                     />
                     <div className="main">
                         <Route
@@ -78,19 +64,19 @@ export default class ApplicationView extends Backbone.View {
                         <Route
                             path="/calendar" exact
                             render={props => (
-                                <Calendar model={this.model} {...props} />
+                                <Calendar model={model} {...props} />
                             )}
                         />
                         <Route
                             path="/projects" exact
                             render={props => (
-                                <ProjectList model={this.model} {...props} />
+                                <ProjectList model={model} {...props} />
                             )}
                         />
                         <Route
                             path="/projects/:taskId" exact
                             render={props => (
-                                <SingleProject model={this.model} {...props} />
+                                <SingleProject model={model} {...props} />
                             )}
                         />
                         <Route
@@ -98,7 +84,7 @@ export default class ApplicationView extends Backbone.View {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <MyStatusReports model={this.model} {...props} />
+                                        <MyStatusReports model={model} {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -110,7 +96,7 @@ export default class ApplicationView extends Backbone.View {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <AllStatusReports model={this.model} {...props} />
+                                        <AllStatusReports model={model} {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -122,7 +108,7 @@ export default class ApplicationView extends Backbone.View {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <EditStatusReport model={this.model} {...props} />
+                                        <EditStatusReport model={model} {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -134,7 +120,7 @@ export default class ApplicationView extends Backbone.View {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <ViewStatusReport model={this.model} {...props} />
+                                        <ViewStatusReport model={model} {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -146,7 +132,7 @@ export default class ApplicationView extends Backbone.View {
                             render={props => (
                                 <React.Fragment>
                                     {isMentor ? (
-                                        <AllUsers model={this.model} {...props} />
+                                        <AllUsers model={model} {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -167,9 +153,7 @@ export default class ApplicationView extends Backbone.View {
                         />
                     </div>
                 </React.Fragment>
-            </BrowserRouter>,
-            this.el);
-
-        return this;
+            </BrowserRouter>
+        );
     }
 }
