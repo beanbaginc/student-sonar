@@ -1,7 +1,9 @@
 // jshint ignore: start
 
 import React from 'react';
+import { connect } from 'react-redux';
 
+import { fetchProjects } from './redux/modules/projects';
 import Project from './project';
 import ScrollSpy from './scrollspy';
 
@@ -32,40 +34,30 @@ const ProjectSection = ({ id, name, tasks }) => (
 );
 
 
-export default class ProjectList extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
+class ProjectList extends React.Component {
     componentDidMount() {
-        this.props.model.on('ready', this.handleChange);
-        this.props.model.get('projects').fetch().then(this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
+        const { dispatch } = this.props;
+        dispatch(fetchProjects());
     }
 
     render() {
-        const sections = this.props.model.get('projects').map(section => ({
-            id: section.get('id'),
-            name: section.get('name'),
-            tasks: section.get('tasks')
-                .filter(task => !task.get('completed'))
-                .map(task => ({
-                    assignee: task.get('assignee_email'),
-                    html: task.get('html'),
-                    id: task.get('id'),
-                    name: task.get('name'),
-                    projects: task.get('projects'),
-                    tags: task.get('tags'),
-                })),
-        }));
+        if (this.props.isFetching) {
+            return (
+                <div className="spinner">
+                    <span className="fa fa-refresh fa-spin"></span>
+                </div>
+            );
+        }
+
+        const sections = Object.entries(this.props.projects).map(item => {
+            const [name, section] = item;
+
+            return {
+                id: section.id,
+                name,
+                tasks: section.tasks,
+            };
+        });
 
         return (
             <ScrollSpy
@@ -90,3 +82,17 @@ export default class ProjectList extends React.Component {
         );
     }
 }
+
+
+function mapStateToProps(state) {
+    const { projects } = state;
+    const { isFetching, items } = projects;
+
+    return {
+        isFetching,
+        projects: items,
+    };
+}
+
+
+export default connect(mapStateToProps)(ProjectList);

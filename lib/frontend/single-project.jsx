@@ -1,44 +1,51 @@
 // jshint ignore: start
 
 import React from 'react';
+import { connect } from 'react-redux';
 
+import { fetchProjects } from './redux/modules/projects';
 import Project from './project';
 
 
-export default class ProjectSingle extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
+class ProjectSingle extends React.Component {
     componentDidMount() {
-        this.props.model.on('ready', this.handleChange);
-        this.props.model.get('projects').fetch().then(this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
+        const { dispatch } = this.props;
+        dispatch(fetchProjects());
     }
 
     render() {
-        const { match, model } = this.props;
-        const task = (
-            model.get('projects')
-                .chain()
-                .map(section => section.get('tasks').get(match.params.taskId))
-                .filter()
-                .first()
-                .value()
-            || null);
+        const { isFetching, match, projects } = this.props;
+
+        if (isFetching) {
+            return (
+                <div className="spinner">
+                    <span className="fa fa-refresh fa-spin"></span>
+                </div>
+            );
+        }
+
+        const task = Object.values(projects)
+            .map(section => section.tasks.find(task => task.id == match.params.taskId))
+            .reduce((accumulator, value) => value || accumulator, null);
 
         return task && (
             <div id="ideas" className="content-inner">
-                <Project {...task.attributes}>{task.attributes.html}</Project>
+                <Project {...task}>{task.html}</Project>
             </div>
         );
     }
 }
+
+
+function mapStateToProps(state) {
+    const { projects } = state;
+    const { isFetching, items } = projects;
+
+    return {
+        isFetching,
+        projects: items,
+    };
+}
+
+
+export default connect(mapStateToProps)(ProjectSingle);

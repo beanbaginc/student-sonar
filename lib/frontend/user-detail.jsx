@@ -4,10 +4,12 @@ import CalendarHeatmap from 'cal-heatmap';
 import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 import showdown from 'showdown';
 import { Link } from 'react-router-dom';
 import _ from 'underscore';
 
+import { fetchProjects } from './redux/modules/projects';
 import Editable from './editable';
 import { intersectionExists } from './util';
 
@@ -481,48 +483,26 @@ class Timeline extends React.Component {
 
 
 class Projects extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            tasks: null,
-        };
-    }
-
     componentDidMount() {
-        this.update();
-    }
-
-    componentDidUpdate(prevProps) {
-        if (prevProps.user.id !== this.props.user.id) {
-            this.update();
-        }
-    }
-
-    update() {
-        const projects = window.application.get('projects');
-
-        this.setState({ tasks: null });
-
-        projects.fetch().then(() => {
-            const email = this.props.user.get('email');
-            const tasks =
-                [].concat(...projects.map(section =>
-                    section.get('tasks').where({assignee_email: email})))
-                .map(task => task.attributes);
-
-            this.setState({ tasks });
-        });
+        const { dispatch } = this.props;
+        dispatch(fetchProjects());
     }
 
     render() {
-        if (this.state.tasks === null) {
+        const { isFetching, projects, user } = this.props;
+
+        if (isFetching) {
             return <span className="fa fa-refresh fa-spin" />;
         }
 
+        const email = user.get('email');
+        const tasks = [].concat(...(
+            Object.values(projects).map(section => section.tasks)))
+            .filter(task => task.assignee === email);
+
         return (
             <ul className="link-list">
-                {this.state.tasks.map(task => (
+                {tasks.map(task => (
                     <li key={task.id}>
                         <Link to={`/projects/${task.id}`}>
                             {task.completed && (
@@ -536,6 +516,17 @@ class Projects extends React.Component {
         );
     }
 }
+
+
+Projects = connect(state => {
+    const { projects } = state;
+    const { isFetching, items } = projects;
+
+    return {
+        isFetching,
+        projects: items,
+    }
+})(Projects);
 
 
 const SummaryEntry = props => (

@@ -298,77 +298,77 @@ html, body, .root {
     height: 100%;
     grid-template-columns: auto 300px;
     grid-template-areas: "project-list-ideas project-list-nav";
+}
 
-    #ideas-container {
-        grid-area: project-list-ideas;
-        overflow-y: scroll;
+#ideas-container {
+    grid-area: project-list-ideas;
+    overflow-y: scroll;
+}
+
+#ideas {
+    position: relative;
+
+    .page-header {
+        margin: 0;
     }
 
-    #ideas {
-        position: relative;
-
-        .page-header {
-            margin: 0;
-        }
-
-        .assignee {
-            margin-left: 6px;
-            vertical-align: text-bottom;
-            width: 28px;
-            height: 28px;
-        }
-
-        .tags {
-            margin-bottom: 10px;
-        }
-
-        section {
-            margin: 0 0 3em 0;
-        }
-
-        ol, ul {
-            margin: 1em 0 2em 0;
-        }
+    .assignee {
+        margin-left: 6px;
+        vertical-align: text-bottom;
+        width: 28px;
+        height: 28px;
     }
 
-    #ideas-nav-container {
-        grid-area: project-list-nav;
-        overflow-y: scroll;
+    .tags {
+        margin-bottom: 10px;
+    }
 
-        // TODO: import bootstrap defs and use primary color from there.
-        @color-muted: #333;
-        @color-primary: #337ab7;
+    section {
+        margin: 0 0 3em 0;
+    }
+
+    ol, ul {
+        margin: 1em 0 2em 0;
+    }
+}
+
+#ideas-nav-container {
+    grid-area: project-list-nav;
+    overflow-y: scroll;
+
+    // TODO: import bootstrap defs and use primary color from there.
+    @color-muted: #333;
+    @color-primary: #337ab7;
+
+    .nav {
+        li {
+            a {
+                font-size: 13px;
+                font-weight: 500;
+                padding: 4px 10px 4px 13px;
+                color: @color-muted;
+
+                &:focus {
+                    background-color: transparent;
+                }
+            }
+
+            &.active > a {
+                border-left: 3px @color-primary solid;
+                padding-left: 10px;
+                color: @color-primary;
+            }
+        }
 
         .nav {
             li {
                 a {
-                    font-size: 13px;
-                    font-weight: 500;
-                    padding: 4px 10px 4px 13px;
-                    color: @color-muted;
-
-                    &:focus {
-                        background-color: transparent;
-                    }
+                    font-weight: 400;
+                    padding-left: 33px;
                 }
 
                 &.active > a {
-                    border-left: 3px @color-primary solid;
-                    padding-left: 10px;
-                    color: @color-primary;
-                }
-            }
-
-            .nav {
-                li {
-                    a {
-                        font-weight: 400;
-                        padding-left: 33px;
-                    }
-
-                    &.active > a {
-                        padding-left: 30px;
-                    }
+                    padding-left: 30px;
                 }
             }
         }
@@ -404,7 +404,7 @@ html, body, .root {
 }
 
 
-#spinner {
+.spinner {
     display: flex;
     justify-content: center;
     align-items: center;

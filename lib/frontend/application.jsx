@@ -1,8 +1,10 @@
 // jshint ignore: start
 
 import React from 'react';
+import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
+import { fetchUsers } from './redux/modules/users';
 import AllStatusReports from './all-status-reports';
 import AllUsers from './all-users';
 import Calendar from './calendar';
@@ -34,7 +36,12 @@ const PermissionDenied = props => (
 );
 
 
-export default class Application extends React.Component {
+class Application extends React.Component {
+    componentDidMount() {
+        const { dispatch } = this.props;
+        dispatch(fetchUsers());
+    }
+
     render() {
         const { model } = this.props;
         const loggedIn = (window.userId !== null);
@@ -46,8 +53,6 @@ export default class Application extends React.Component {
                     <Header
                         loggedIn={loggedIn}
                         isMentor={isMentor}
-                        manage={model.get('manage')}
-                        onManageChanged={manage => model.set({ manage })}
                     />
                     <Sidebar
                         loggedIn={loggedIn}
@@ -157,3 +162,11 @@ export default class Application extends React.Component {
         );
     }
 }
+
+
+function mapStateToProps(state) {
+    return {};
+}
+
+
+export default connect(mapStateToProps)(Application);

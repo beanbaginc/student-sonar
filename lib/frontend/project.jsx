@@ -1,22 +1,16 @@
 // jshint ignore: start
 
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 
-export default class Project extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
+class Project extends React.Component {
     render() {
         const user = (window.application.get('loggedIn') && this.props.assignee)
-            ? window.application.get('users').findWhere({email: this.props.assignee})
+            ? this.props.users.items.find(user => user.email === this.props.assignee)
             : null;
-        const userAvatar = user && user.get('avatar');
-        const canSeeUsers = (window.userType === 'mentor' ||
-                             window.userType === 'instructor');
-        const userLink = (user && canSeeUsers) ? `/users/${user.get('slack_username')}` : null;
+        const userAvatar = user && user.avatar;
 
         // If an avatar exists. include it.
         let avatar = userAvatar
@@ -25,9 +19,13 @@ export default class Project extends React.Component {
 
         // If the logged in user can see user detail pages (mentors), wrap the
         // avatar in a link.
-        avatar = (avatar && userLink)
-            ? <Link to={userLink} className="user-avatar">{avatar}</Link>
-            : avatar;
+        if (avatar && window.userType === 'mentor') {
+            avatar = (
+                <Link to={`/users/${user.slack_username}`} className="user-avatar">
+                    {avatar}
+                </Link>
+            );
+        }
 
         const projects = this.props.projects
             .filter(project => project !== 'Student Projects')
@@ -52,3 +50,13 @@ export default class Project extends React.Component {
         );
     }
 }
+
+
+function mapStateToProps(state) {
+    const { users } = state;
+
+    return { users };
+}
+
+
+export default connect(mapStateToProps)(Project);
