@@ -1,23 +1,12 @@
 // jshint ignore: start
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 
 export default class Project extends React.Component {
     constructor(props) {
         super(props);
-        this._onUserClicked = this._onUserClicked.bind(this);
-    }
-
-    _onUserClicked(e) {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const path = e.currentTarget.getAttribute('href');
-
-        if (path) {
-            window.application.go('path');
-        }
     }
 
     render() {
@@ -37,7 +26,7 @@ export default class Project extends React.Component {
         // If the logged in user can see user detail pages (mentors), wrap the
         // avatar in a link.
         avatar = (avatar && userLink)
-            ? <a href={userLink} className="user-avatar" onClick={this._onUserClicked}>{avatar}</a>
+            ? <Link to={userLink} className="user-avatar">{avatar}</Link>
             : avatar;
 
         const projects = this.props.projects

@@ -5,11 +5,6 @@ import { NavLink } from 'react-router-dom';
 
 
 class SidebarItem extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
     render() {
         const { to, icon, label } = this.props;
 
@@ -19,25 +14,12 @@ class SidebarItem extends React.Component {
                     to={to} exact
                     className="nav-link"
                     activeClassName="active"
-                    onClick={this.onClick}>
+                >
                     {icon && <img src={icon} className="sidebar-icon" />}
                     {label}
                 </NavLink>
             </li>
         );
-    }
-
-    onClick(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.stopPropagation();
-        e.preventDefault();
-
-        const path = e.target.getAttribute('href');
-
-        if (path) {
-            window.application.go(path.substr(1));
-        }
     }
 }
 

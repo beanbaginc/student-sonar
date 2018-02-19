@@ -1,28 +1,10 @@
 // jshint ignore: start
 
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 class RowView extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.preventDefault();
-        e.stopPropagation();
-
-        const path = e.target.getAttribute('href');
-
-        if (path) {
-            window.application.go(path);
-        }
-    }
-
     render() {
         const user = this.props.user.attributes;
         const groups = [...(user.groups)].map(group =>
@@ -31,10 +13,10 @@ class RowView extends React.Component {
         return (
             <tr>
                 <td>
-                    <NavLink to={`/users/${user.slack_username}`} exact onClick={this.onClick}>
+                    <Link to={`/users/${user.slack_username}`}>
                         {user.avatar && <img src={user.avatar} className="img-rounded" width="24" height="24" />}
                         {user.name}
-                    </NavLink>
+                    </Link>
                 </td>
                 <td>{user.school}</td>
                 <td>{user.email}</td>

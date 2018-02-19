@@ -2,7 +2,7 @@
 
 import React from 'react';
 import moment from 'moment';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import Confirm from './confirm';
 import Editable from './editable';
@@ -13,21 +13,7 @@ class RowView extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
-        this.onUserClicked = this.onUserClicked.bind(this);
         this.onDeleteClicked = this.onDeleteClicked.bind(this);
-    }
-
-    onUserClicked(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.preventDefault();
-        e.stopPropagation();
-
-        const path = e.currentTarget.getAttribute('href');
-
-        if (path) {
-            window.application.go(path);
-        }
     }
 
     componentDidMount() {
@@ -128,17 +114,17 @@ class RowView extends React.Component {
                     {users.map(user => (
                         <React.Fragment key={user.name}>
                             {user.report ? (
-                                <NavLink
+                                <Link
                                     key={user.name}
-                                    to={`/status/view/${user.report}`} exact
-                                    onClick={this.onUserClicked}>
+                                    to={`/status/view/${user.report}`}
+                                >
                                     <img
                                         className="avatar img-rounded"
                                         src={user.avatar}
                                         title={user.name}
                                         alt={user.name}
                                     />
-                                </NavLink>
+                                </Link>
                             ) : (
                                 <img
                                     key={user.name}

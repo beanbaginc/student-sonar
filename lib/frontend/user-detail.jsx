@@ -5,7 +5,7 @@ import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import showdown from 'showdown';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import _ from 'underscore';
 
 import Editable from './editable';
@@ -484,7 +484,6 @@ class Projects extends React.Component {
     constructor(props) {
         super(props);
 
-        this.onClick = this.onClick.bind(this);
         this.state = {
             tasks: null,
         };
@@ -516,41 +515,21 @@ class Projects extends React.Component {
         });
     }
 
-    onClick(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.stopPropagation();
-        e.preventDefault();
-
-        const path = e.target.getAttribute('href');
-
-        if (path) {
-            window.application.go(path.substr(1));
-        }
-    }
-
     render() {
         if (this.state.tasks === null) {
             return <span className="fa fa-refresh fa-spin" />;
         }
 
-        // TODO: switch to NavLink once there's no boundary between this and the
-        // router.
-        //                <NavLink
-        //                    to={`/projects/${task.id}`} exact
-        //                    onClick={onClick}>
         return (
             <ul className="link-list">
                 {this.state.tasks.map(task => (
                     <li key={task.id}>
-                        <a
-                            href={`/projects/${task.id}`}
-                            onClick={this.onClick}>
+                        <Link to={`/projects/${task.id}`}>
                             {task.completed && (
                                 <span style={{color: 'green'}}>[Completed]</span>
                             )}
                             {task.name}
-                        </a>
+                        </Link>
                     </li>
                 ))}
             </ul>
@@ -641,7 +620,6 @@ export default class UserDetail extends React.Component {
         super(props);
 
         this.update = this.update.bind(this);
-        this.onNavClicked = this.onNavClicked.bind(this);
 
         this.events = [];
         this.state = {
@@ -819,19 +797,6 @@ export default class UserDetail extends React.Component {
         });
     }
 
-    onNavClicked(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.stopPropagation();
-        e.preventDefault();
-
-        const path = e.target.getAttribute('href');
-
-        if (path) {
-            window.application.go(path.substr(1));
-        }
-    }
-
     render() {
         const {
             codeReviews,
@@ -851,22 +816,15 @@ export default class UserDetail extends React.Component {
             status_reports: legacyStatusReports,
         } = user.attributes;
 
-
-        // TODO: switch to NavLink once there's a direct line to Router
-        //                <NavLink
-        //                    to={statusReport.href} exact
-        //                    onClick={this.onNavClicked}>
         const statusReportsItems = statusReports === null
             ? <span className="fa fa-refresh fa-spin" />
             : statusReports.map(statusReport => (
                 <li key={`${statusReport.href}-${statusReport.text}`}>
                     {statusReport.href ? (
-                        <a
-                            href={statusReport.href}
-                            onClick={this.onNavClicked}>
+                        <Link to={statusReport.href}>
                             {statusReport.text}
                             {statusReport.late && <span className="text-warning"> (late)</span>}
-                        </a>
+                        </Link>
                     ) : (
                         <span>
                             {statusReport.text}

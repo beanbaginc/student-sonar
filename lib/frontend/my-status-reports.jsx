@@ -2,7 +2,7 @@
 
 import moment from 'moment';
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import {intersectionExists} from './util';
 
@@ -11,7 +11,6 @@ export default class MyStatusReports extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
-        this.onLinkClicked = this.onLinkClicked.bind(this);
     }
 
     componentDidMount() {
@@ -24,19 +23,6 @@ export default class MyStatusReports extends React.Component {
 
     handleChange() {
         this.forceUpdate();
-    }
-
-    onLinkClicked(e) {
-        // TODO: this can go away once we're entirely moved away from
-        // Backbone.Router
-        e.preventDefault();
-        e.stopPropagation();
-
-        const path = e.currentTarget.getAttribute('href');
-
-        if (path) {
-            window.application.go(path);
-        }
     }
 
     render() {
@@ -76,14 +62,13 @@ export default class MyStatusReports extends React.Component {
                 }
 
                 return (
-                    <NavLink
+                    <Link
                         key={dueDateId}
-                        to={`/status/edit/${dueDateId}`} exact
-                        onClick={this.onLinkClicked}
+                        to={`/status/edit/${dueDateId}`}
                         className={`list-group-item ${itemClass}`}>
                         <time>{date.format('ddd, MMM D')}</time>
                         <span>{description}</span>
-                    </NavLink>
+                    </Link>
                 );
             });
 
