@@ -43,9 +43,8 @@ class Application extends React.Component {
     }
 
     render() {
-        const { model } = this.props;
-        const loggedIn = (window.userId !== null);
-        const isMentor = (window.userType === 'mentor');
+        const { loggedIn, model, userType } = this.props;
+        const isMentor = (userType === 'mentor');
 
         return (
             <BrowserRouter>
@@ -164,9 +163,10 @@ class Application extends React.Component {
 }
 
 
-function mapStateToProps(state) {
-    return {};
-}
+const mapStateToProps = state => ({
+    loggedIn: state.loggedIn,
+    userType: state.userType,
+});
 
 
 export default connect(mapStateToProps)(Application);

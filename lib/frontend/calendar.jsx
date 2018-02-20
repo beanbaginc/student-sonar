@@ -303,10 +303,12 @@ class Calendar extends React.Component {
     }
 
     componentDidMount() {
+        this.props.model.on('ready', this.handleChange);
         this.collection.on('add remove update reset', this.handleChange);
     }
 
     componentWillUnmount() {
+        this.props.model.off('ready', this.handleChange);
         this.collection.off('add remove update reset', this.handleChange);
     }
 
@@ -319,21 +321,20 @@ class Calendar extends React.Component {
     }
 
     render() {
-        const { model, manage } = this.props;
+        const { model, manage, myUser, userType } = this.props;
 
-        if (!model.get('ready')) {
+        if (!model.get('ready') || !myUser) {
             return <div className="calendar" />;
         }
 
         const today = moment().startOf('day');
-        const me = model.get('me');
-        const myGroups = me.get('groups');
+        const myGroups = new Set(myUser.groups);
 
         const visibleItems = this.collection
             .chain()
             .filter(item => (
                 (manage || item.get('date') >= today) &&
-                (window.userType === 'mentor' ||
+                (userType === 'mentor' ||
                  intersectionExists(myGroups, item.get('show_to_groups')))))
             .groupBy(item => item.get('date').format('YYYY-MM-DD'))
             .value();
@@ -377,4 +378,9 @@ class Calendar extends React.Component {
 }
 
 
-export default connect(state => ({ manage: state.manage }))(Calendar);
+const mapStateToProps = state => ({
+    manage: state.manage,
+    myUser: state.users.myUser,
+    userType: state.userType,
+});
+export default connect(mapStateToProps)(Calendar);

@@ -7,8 +7,19 @@ import { Link } from 'react-router-dom';
 
 class Project extends React.Component {
     render() {
-        const user = (window.application.get('loggedIn') && this.props.assignee)
-            ? this.props.users.items.find(user => user.email === this.props.assignee)
+        const {
+            assignee,
+            children,
+            id,
+            loggedIn,
+            name,
+            projects,
+            tags,
+            users,
+            userType,
+        } = this.props;
+        const user = (loggedIn && assignee)
+            ? users.find(user => user.email === assignee)
             : null;
         const userAvatar = user && user.avatar;
 
@@ -19,7 +30,7 @@ class Project extends React.Component {
 
         // If the logged in user can see user detail pages (mentors), wrap the
         // avatar in a link.
-        if (avatar && window.userType === 'mentor') {
+        if (avatar && userType === 'mentor') {
             avatar = (
                 <Link to={`/users/${user.slack_username}`} className="user-avatar">
                     {avatar}
@@ -27,22 +38,22 @@ class Project extends React.Component {
             );
         }
 
-        const projects = this.props.projects
+        const projectItems = projects
             .filter(project => project !== 'Student Projects')
             .map(project => <span key={project} className="label label-primary">{project}</span>);
 
-        const tags = this.props.tags
+        const tagItems = tags
             .map(tag => <span key={tag} className="label label-default">{tag}</span>);
 
-        const content = { __html: this.props.children };
+        const content = { __html: children };
 
         return (
-            <section id={`task-${this.props.id}`} className="student-project">
-                <h3>{this.props.name}{avatar}</h3>
-                {(tags || projects) && (
+            <section id={`task-${id}`} className="student-project">
+                <h3>{name}{avatar}</h3>
+                {(tagItems || projectItems) && (
                     <div className="tags">
-                        {projects}
-                        {tags}
+                        {projectItems}
+                        {tagItems}
                     </div>
                 )}
                 <div dangerouslySetInnerHTML={content} />
@@ -52,11 +63,11 @@ class Project extends React.Component {
 }
 
 
-function mapStateToProps(state) {
-    const { users } = state;
-
-    return { users };
-}
+const mapStateToProps = state => ({
+    loggedIn: state.loggedIn,
+    users: state.users.items,
+    userType: state.userType,
+});
 
 
 export default connect(mapStateToProps)(Project);
