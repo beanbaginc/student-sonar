@@ -211,12 +211,10 @@ class ModelLinksWrapper extends React.Component {
     }
 
     componentDidMount() {
-        window.application.on('change:manage', this.handleUpdate);
         this.props.model.on(`change:${this.props.property}`, this.handleUpdate);
     }
 
     componentWillUnmount() {
-        window.application.off('change:manage', this.handleUpdate);
         this.props.model.off(`change:${this.props.property}`, this.handleUpdate);
     }
 
@@ -225,13 +223,13 @@ class ModelLinksWrapper extends React.Component {
     }
 
     render() {
-        const { model, property } = this.props;
+        const { model, property, manage } = this.props;
 
         return (
             <Links
                 items={model.get(property) || []}
                 onChange={links => model.save({ [property]: links }, { wait: true })}
-                manage={window.application.get('manage')}
+                manage={manage}
             />
         );
     }
@@ -239,29 +237,8 @@ class ModelLinksWrapper extends React.Component {
 
 
 class UserBio extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    componentDidMount() {
-        window.application.on('change:manage', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        window.application.off('change:manage', this.handleChange);
-    }
-
-    componentDidUpdate(prevProps) {
-    }
-
-    handleChange() {
-        this.forceUpdate();
-    }
-
     render() {
-        const manage = window.application.get('manage'); // TODO: switch to prop once parent updates
-        const { model } = this.props;
+        const { model, manage } = this.props;
         const {
             avatar,
             email,
@@ -604,7 +581,7 @@ class ChatHistory extends React.Component {
 }
 
 
-export default class UserDetail extends React.Component {
+class UserDetail extends React.Component {
     rbLogoURL = '/images/reviewboard-logo.png';
 
     constructor(props) {
@@ -623,12 +600,12 @@ export default class UserDetail extends React.Component {
     }
 
     componentDidMount() {
-        window.application.on('change:manage ready', this.update);
+        window.application.on('ready', this.update);
         this.update();
     }
 
     componentWillUnmount() {
-        window.application.off('change:manage ready', this.update);
+        window.application.off('ready', this.update);
     }
 
     componentDidUpdate(prevProps) {
@@ -789,6 +766,7 @@ export default class UserDetail extends React.Component {
     }
 
     render() {
+        const { manage } = this.props;
         const {
             codeReviews,
             statusReports,
@@ -800,7 +778,6 @@ export default class UserDetail extends React.Component {
             return <span className="fa fa-refresh fa-spin" />;
         }
 
-        const manage = window.application.get('manage');
         const {
             projects,
             slack_username: slackUsername,
@@ -871,6 +848,7 @@ export default class UserDetail extends React.Component {
                         <ModelLinksWrapper
                             model={user}
                             property="projects"
+                            manage={manage}
                         />
                     ) : (
                         <Projects user={user} />
@@ -880,6 +858,7 @@ export default class UserDetail extends React.Component {
                     <ModelLinksWrapper
                         model={user}
                         property="demos"
+                        manage={manage}
                     />
                 </SummaryEntry>
                 <SummaryEntry title="Status Reports">
@@ -887,6 +866,7 @@ export default class UserDetail extends React.Component {
                         <ModelLinksWrapper
                             model={user}
                             property="status_reports"
+                            manage={manage}
                         />
                     ) : (
                         <ul className="link-list">
@@ -921,3 +901,14 @@ export default class UserDetail extends React.Component {
         );
     }
 }
+
+
+export default connect((state, props) => {
+    const {
+        manage,
+    } = state;
+
+    return {
+        manage,
+    };
+})(UserDetail);

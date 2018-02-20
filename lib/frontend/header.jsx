@@ -7,6 +7,13 @@ import { setManage } from './redux/modules/manage';
 import ToggleSwitch from './toggle-switch';
 
 
+const mapStateToProps = state => ({ manage: state.manage });
+const mapDispatchToProps = (dispatch, props) => ({
+    onChange: manage => dispatch(setManage(manage)),
+});
+const ManageSwitch = connect(mapStateToProps, mapDispatchToProps)(ToggleSwitch);
+
+
 const Header = ({ dispatch, isMentor, loggedIn, manage }) => (
     <nav className="navbar navbar-default header">
         <div className="container-fluid">
@@ -15,12 +22,7 @@ const Header = ({ dispatch, isMentor, loggedIn, manage }) => (
             <div className="collapse navbar-collapse navbar-right">
                 <ul className="nav navbar-nav">
                     {isMentor && (
-                        <li>
-                            <ToggleSwitch
-                                label="Manage"
-                                checked={manage}
-                                onChange={manage => dispatch(setManage(manage))} />
-                        </li>
+                        <li><ManageSwitch label="Manage" /></li>
                     )}
 
                     {loggedIn ? (
@@ -35,9 +37,4 @@ const Header = ({ dispatch, isMentor, loggedIn, manage }) => (
 );
 
 
-function mapStateToProps(state) {
-    return { manage: state.manage };
-}
-
-
-export default connect(mapStateToProps)(Header);
+export default Header;

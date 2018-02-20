@@ -1,8 +1,9 @@
 // jshint ignore: start
 
+import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import moment from 'moment';
+import { connect } from 'react-redux';
 
 import Confirm from './confirm';
 import {CalendarItem} from './models';
@@ -291,7 +292,7 @@ class CalendarEntry extends React.Component {
 }
 
 
-export default class Calendar extends React.Component {
+class Calendar extends React.Component {
     constructor(props) {
         super(props);
 
@@ -302,12 +303,10 @@ export default class Calendar extends React.Component {
     }
 
     componentDidMount() {
-        this.props.model.on('ready change:manage', this.handleChange);
         this.collection.on('add remove update reset', this.handleChange);
     }
 
     componentWillUnmount() {
-        this.props.model.off('ready change:manage', this.handleChange);
         this.collection.off('add remove update reset', this.handleChange);
     }
 
@@ -320,14 +319,15 @@ export default class Calendar extends React.Component {
     }
 
     render() {
-        if (!this.props.model.get('ready')) {
+        const { model, manage } = this.props;
+
+        if (!model.get('ready')) {
             return <div className="calendar" />;
         }
 
         const today = moment().startOf('day');
-        const me = this.props.model.get('me');
+        const me = model.get('me');
         const myGroups = me.get('groups');
-        const manage = this.props.model.get('manage');
 
         const visibleItems = this.collection
             .chain()
@@ -375,3 +375,6 @@ export default class Calendar extends React.Component {
         );
     }
 }
+
+
+export default connect(state => ({ manage: state.manage }))(Calendar);

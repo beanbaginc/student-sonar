@@ -1,7 +1,8 @@
 // jshint ignore: start
 
-import React from 'react';
 import moment from 'moment';
+import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import Confirm from './confirm';
@@ -144,7 +145,7 @@ class RowView extends React.Component {
 }
 
 
-export default class AllStatusReports extends React.Component {
+class AllStatusReports extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
@@ -155,7 +156,6 @@ export default class AllStatusReports extends React.Component {
 
     componentDidMount() {
         this.props.model.on('ready', this.handleChange);
-        this.props.model.on('change:manage', this.handleChange);
         this.statusReportDueDates.on('add', this.handleChange);
         this.statusReportDueDates.on('remove', this.handleChange);
         this.statusReportDueDates.on('change', this.handleChange);
@@ -163,7 +163,6 @@ export default class AllStatusReports extends React.Component {
 
     componentWillUnmount() {
         this.props.model.off('ready', this.handleChange);
-        this.props.model.off('change:manage', this.handleChange);
         this.statusReportDueDates.off('add', this.handleChange);
         this.statusReportDueDates.off('remove', this.handleChange);
         this.statusReportDueDates.off('change', this.handleChange);
@@ -181,8 +180,7 @@ export default class AllStatusReports extends React.Component {
     }
 
     render() {
-        const { model } = this.props;
-        const manage = model.get('manage');
+        const { model, manage } = this.props;
 
         const allGroups = model.get('groups');
         const activeGroupIds = new Set(
@@ -269,3 +267,6 @@ export default class AllStatusReports extends React.Component {
         );
     }
 }
+
+
+export default connect(state => ({ manage: state.manage }))(AllStatusReports);
