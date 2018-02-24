@@ -6,8 +6,12 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import Confirm from './confirm';
-import {CalendarItem} from './models';
-import {intersectionExists} from './util';
+import {
+    deleteCalendarItem,
+    fetchCalendar,
+    saveCalendarItem
+} from './redux/modules/calendar';
+import { intersectionExists } from './util';
 
 
 class ModalDialog extends React.Component {
@@ -83,10 +87,12 @@ class EditCalendarEntry extends React.Component {
         this.onGroupsChanged = this.onGroupsChanged.bind(this);
         this.onSaveClicked = this.onSaveClicked.bind(this);
 
+        const { item } = props;
+
         this.state = {
-            date: props.model.get('date'),
-            groups: props.model.getGroupsString(),
-            summary: props.model.get('summary'),
+            date: item ? item.date : '',
+            groups: item ? item.show_to_groups : '',
+            summary: item ? item.summary : '',
         };
     }
 
@@ -127,43 +133,28 @@ class EditCalendarEntry extends React.Component {
     }
 
     onGroupsChanged(e) {
-        this.setState({ groups: e.target.value });
+        this.setState({ groups: e.target.value.split(',') });
     }
 
     onSaveClicked() {
         const attrs = {
-            date: moment(this.state.date),
-            show_to_groups: new Set(this.state.groups.split(',')),
+            _id: this.props.item ? this.props.item._id : undefined,
+            date: this.state.date,
+            show_to_groups: this.state.groups,
             summary: this.state.summary,
         };
 
-        const options = {
-            wait: true,
-            success: () => this.props.onClose(),
-            error: () => {
-                // TODO: this should be done through react instead. Though I've
-                // never seen it actually fail.
-                $('<div class="alert alert-danger">')
-                    .text('Failed to save calendar item')
-                    .prependTo(this.$modal.find('.modal-body'));
-
-                this.$modal.find('button.close').prop('disabled', false);
-                this.$modal.find('#cancel-button').prop('disabled', false);
-            }
-        };
-
-        if (this.props.model.isNew()) {
-            window.application.get('calendar').create(attrs, options);
-        } else {
-            this.props.model.save(attrs, options);
+        if (this.props.onSave) {
+            this.props.onSave(attrs);
         }
+        this.props.onClose();
     }
 
     render() {
         return (
             <ModalDialog
                 id="calendar-edit"
-                title={this.props.model.isNew() ? 'Create new event' : 'Edit event'}
+                title={this.props.item ? 'Edit event' : 'Create new event'}
                 onSave={this.onSaveClicked}
                 onClose={this.props.onClose}
                 ref={el => this.$modal = el ? $(el) : null}>
@@ -214,21 +205,8 @@ class EditCalendarEntry extends React.Component {
 class CalendarEntry extends React.Component {
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
         this.onDeleteClicked = this.onDeleteClicked.bind(this);
         this.state = { edit: false };
-    }
-
-    componentDidMount() {
-        this.props.model.on('change', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('change', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
     }
 
     onDeleteClicked() {
@@ -240,16 +218,14 @@ class CalendarEntry extends React.Component {
                 accept_button_class: 'btn-danger',
             });
 
-        confirmDlg.on('accept', () => this.props.model.destroy());
+        confirmDlg.on('accept', () => this.props.onDelete(this.props.item._id));
     }
 
     render() {
-        const { model, manage } = this.props;
-        const groups = model.get('show_to_groups');
+        const { item, manage } = this.props;
 
-        //    <li className="calendar-item">
         return (
-            <React.Fragment>
+            <li className="calendar-item">
                 {manage && (
                     <div className="btn-group">
                         <button
@@ -269,11 +245,11 @@ class CalendarEntry extends React.Component {
                     </div>
                 )}
 
-                {model.get('summary')}
+                {item.summary}
 
                 {manage && (
                     <div className="labels">
-                        {[...groups].map(group => (
+                        {[...item.show_to_groups].map(group => (
                             <span key={group} className="label label-default">{group}</span>
                         ))}
                     </div>
@@ -281,13 +257,13 @@ class CalendarEntry extends React.Component {
 
                 {this.state.edit && (
                     <EditCalendarEntry
-                        model={this.props.model}
+                        item={item}
                         onClose={() => this.setState({ edit: false })}
+                        onSave={this.props.onSave}
                     />
                 )}
-            </React.Fragment>
+            </li>
         );
-        //    </li>
     }
 }
 
@@ -296,24 +272,12 @@ class Calendar extends React.Component {
     constructor(props) {
         super(props);
 
-        this.collection = this.props.model.get('calendar');
-        this.handleChange = this.handleChange.bind(this);
         this.onCreateClicked = this.onCreateClicked.bind(this);
         this.state = { addingNew: false };
     }
 
     componentDidMount() {
-        this.props.model.on('ready', this.handleChange);
-        this.collection.on('add remove update reset', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.handleChange);
-        this.collection.off('add remove update reset', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
+        this.props.onFetch();
     }
 
     onCreateClicked() {
@@ -321,34 +285,50 @@ class Calendar extends React.Component {
     }
 
     render() {
-        const { model, manage, myUser, userType } = this.props;
+        const { calendar, manage, myUser, userType } = this.props;
 
-        if (!model.get('ready') || !myUser) {
+        if (calendar.isFetching || !myUser) {
             return <div className="calendar" />;
         }
 
         const today = moment().startOf('day');
         const myGroups = new Set(myUser.groups);
 
-        const visibleItems = this.collection
-            .chain()
-            .filter(item => (
-                (manage || item.get('date') >= today) &&
-                (userType === 'mentor' ||
-                 intersectionExists(myGroups, item.get('show_to_groups')))))
-            .groupBy(item => item.get('date').format('YYYY-MM-DD'))
-            .value();
+        const items = {};
+        calendar.items.forEach(item => {
+            const date = moment(item.date);
 
-        const dates = Object.keys(visibleItems).sort()
+            if ((date < today && !manage) ||
+                !(userType === 'mentor' ||
+                  intersectionExists(myGroups, new Set(item.show_to_groups)))) {
+                return;
+            }
+
+            const key = date.format('YYYY-MM-DD');
+            if (items.hasOwnProperty(key)) {
+                items[key].push(item);
+            } else {
+                items[key] = [item];
+            }
+        });
+
+        const dates = Object.keys(items).sort()
             .map(date => {
-                const items = visibleItems[date];
+                const entries = items[date];
+                const dateText = moment(date).format('ddd, MMM D');
 
                 return (
                     <li key={date} className="event-list-day">
-                        <time>{items[0].get('date').format('ddd, MMM D')}</time>
+                        <time>{dateText}</time>
                         <ul>
-                            {items.map(item => (
-                                <CalendarEntry key={item.id} model={item} manage={manage} />
+                            {entries.map(item => (
+                                <CalendarEntry
+                                    key={item._id}
+                                    item={item}
+                                    manage={manage}
+                                    onDelete={this.props.onDelete}
+                                    onSave={this.props.onSave}
+                                />
                             ))}
                         </ul>
                     </li>
@@ -368,8 +348,8 @@ class Calendar extends React.Component {
                 )}
                 {this.state.addingNew && (
                     <EditCalendarEntry
-                        model={new CalendarItem()}
                         onClose={() => this.setState({ addingNew: false })}
+                        onSave={this.props.onSave}
                     />
                 )}
             </div>
@@ -379,8 +359,14 @@ class Calendar extends React.Component {
 
 
 const mapStateToProps = state => ({
+    calendar: state.calendar,
     manage: state.manage,
     myUser: state.users.myUser,
     userType: state.userType,
 });
-export default connect(mapStateToProps)(Calendar);
+const mapDispatchToProps = (dispatch, props) => ({
+    onDelete: id => dispatch(deleteCalendarItem(id)),
+    onSave: item => dispatch(saveCalendarItem(item)),
+    onFetch: () => dispatch(fetchCalendar()),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Calendar);

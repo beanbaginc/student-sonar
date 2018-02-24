@@ -68,7 +68,7 @@ class Application extends React.Component {
                         <Route
                             path="/calendar" exact
                             render={props => (
-                                <Calendar model={model} {...props} />
+                                <Calendar {...props} />
                             )}
                         />
                         <Route
