@@ -1,8 +1,10 @@
-#!/usr/bin/env ./node_modules/.bin/babel-node
+#!/usr/bin/env ./node_modules/.bin/babel-node --presets env --plugins dedent
 
-const Q = require('q'),
-      init = require('../lib/init'),
-      schema = require('../lib/schema');
+import Q from 'q';
+
+import init from '../lib/init';
+import schema from '../lib/schema';
+import Slack from '../lib/slack';
 
 function updateUser(user) {
     const deferred = Q.defer();
@@ -10,7 +12,8 @@ function updateUser(user) {
     if (user.is_bot) {
         deferred.resolve();
     } else {
-        console.log('Saving data for %s (%s - %s)', user.real_name, user.name, user.id);
+        console.log('Saving data for %s (%s - %s)',
+	            user.profile.real_name_normalized, user.name, user.id);
 
         try {
             let query = schema.User.findOneAndUpdate(
@@ -19,7 +22,7 @@ function updateUser(user) {
                     email: user.profile.email,
                     slack_user_id: user.id,
                     slack_username: user.name,
-                    name: user.real_name,
+                    name: user.profile.real_name_normalized,
                     avatar: user.profile.image_192,
                     timezone: user.tz
                 },
@@ -35,7 +38,7 @@ function updateUser(user) {
 
 init()
     .then(function(options) {
-        const slack = require('../lib/slack')(options.config);
+        const slack = new Slack(options.config);
 
         return slack.getUsers()
             .then(users => Promise.all(users.members.map(updateUser)));
