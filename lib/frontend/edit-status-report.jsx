@@ -3,12 +3,14 @@
 import moment from 'moment';
 import React from 'react';
 import ReactMDE from 'react-mde';
+import { connect } from 'react-redux';
 
 import ToggleSwitch from './toggle-switch';
+import { saveStatusReport } from './redux/modules/status-reports';
 import * as models from './models';
 
 
-export default class EditStatusReport extends React.Component {
+class EditStatusReport extends React.Component {
     static defaultContent = dedent`
         This is an example template. Please replace all the bullet-points with your
         own status items.
@@ -62,7 +64,6 @@ export default class EditStatusReport extends React.Component {
         super(props);
         this.onModelReady = this.onModelReady.bind(this);
         this.onEditorChanged = this.onEditorChanged.bind(this);
-        this.onSaveClicked = this.onSaveClicked.bind(this);
 
         this.state = {
             value: null,
@@ -90,50 +91,16 @@ export default class EditStatusReport extends React.Component {
         });
     }
 
-    onSaveClicked(e) {
-        e.stopPropagation()
-        e.preventDefault();
-
-        const { text } = this.state.value;
-
-        if (this.report.isNew()) {
-            this.report = this.props.model.get('statusReports').create({
-                date_due: this.props.match.params.dueDateId,
-                date_submitted: moment(),
-                text: text,
-                user: window.userId,
-            }, {
-                success: () => this.setState({ unsaved: false }),
-            });
-        } else {
-            // TODO: handle error case
-            this.report.save(
-                { text },
-                {
-                    success: () => this.setState({ unsaved: false }),
-                });
-        }
-    }
-
     render() {
-        const { model, match } = this.props;
+        const {
+            dueDate,
+            model,
+            match,
+            statusReport,
+        } = this.props;
 
-        if (!model.get('ready')) {
+        if (!statusReport) {
             return <div className="status-report-editor content-inner" />;
-        }
-
-        const dueDateId = match.params.dueDateId;
-        const dueDate = model.get('statusReportDueDates').get(dueDateId);
-
-        this.report = model.get('statusReports').findWhere({
-            date_due: dueDateId,
-            user: window.userId,
-        });
-
-        if (this.report === undefined) {
-            this.report = new models.StatusReport({
-                date_due: dueDateId,
-            });
         }
 
         const mde_visibility = {
@@ -143,15 +110,21 @@ export default class EditStatusReport extends React.Component {
         };
 
         const mde_value = this.state.value || {
-            text: this.report.get('text') || EditStatusReport.defaultContent,
+            text: statusReport.text || EditStatusReport.defaultContent,
             selection: null,
+        };
+
+        const onSaveClicked = () => {
+            statusReport.text = this.state.value.text;
+            this.props.onChange(statusReport);
+            this.setState({ unsaved: false });
         };
 
         return (
             <div className="status-report-editor">
                 <div className={`panel panel-default ${this.state.preview ? 'preview' : ''}`}>
                     <div className="panel-heading">
-                        <span>Status report for {dueDate.get('date').format('ddd, MMM D')}</span>
+                        <span>Status report for {moment(dueDate.date).format('ddd, MMM D')}</span>
 
                         <span className="text-warning">
                             {this.state.unsaved && 'There are unsaved changes'}
@@ -164,7 +137,7 @@ export default class EditStatusReport extends React.Component {
                         <button
                             type="button"
                             className="btn btn-sm btn-primary"
-                            onClick={this.onSaveClicked}>
+                            onClick={onSaveClicked}>
                             Save
                         </button>
                     </div>
@@ -180,3 +153,39 @@ export default class EditStatusReport extends React.Component {
         );
     }
 }
+
+
+const mapStateToProps = (state, props) => {
+    const {
+        statusReportDueDates,
+        statusReports,
+        users,
+    } = state;
+
+    const dueDate = statusReportDueDates.items.find(
+        dueDate => dueDate._id === props.match.params.dueDateId);
+
+    let statusReport = null;
+
+    if (dueDate && users.myUser) {
+        statusReport = statusReports.items.find(report => (
+            report.date_due === dueDate._id &&
+            report.user === users.myUser._id))
+
+        if (!statusReport) {
+            statusReport = {
+                date_due: dueDate._id,
+                user: users.myUser._id,
+            };
+        }
+    }
+
+    return {
+        dueDate,
+        statusReport,
+    }
+};
+const mapDispatchToProps = (dispatch, props) => ({
+    onChange: statusReport => dispatch(saveStatusReport(statusReport)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(EditStatusReport);

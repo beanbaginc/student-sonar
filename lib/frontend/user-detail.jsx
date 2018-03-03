@@ -595,7 +595,7 @@ class UserDetail extends React.Component {
             events: [],
             statusReports: null,
             reviewRequests: null,
-            user: null,
+            userModel: null,
         };
     }
 
@@ -615,27 +615,25 @@ class UserDetail extends React.Component {
     }
 
     update() {
-        const user = window.application.get('users')
+        const userModel = window.application.get('users')
             .findWhere({ slack_username: this.props.match.params.userId });
 
-        if (user) {
+        if (userModel) {
             this.setState({
                 codeReviews: null,
                 events: [],
-                statusReports: null,
                 reviewRequests: null,
-                user: user,
+                userModel: userModel,
             });
 
             this.events = [];
-            this.updateCodeReviews(user);
-            this.updateReviewRequests(user);
-            this.updateStatusReports(user);
+            this.updateCodeReviews(userModel);
+            this.updateReviewRequests(userModel);
         }
     }
 
-    updateCodeReviews(user) {
-        fetch(`/api/reviews/${user.get('rb_username')}`)
+    updateCodeReviews(userModel) {
+        fetch(`/api/reviews/${userModel.get('rb_username')}`)
             .then(result => result.json())
             .then(result => {
                 const events = Array.from(this.events);
@@ -667,8 +665,8 @@ class UserDetail extends React.Component {
             });
     }
 
-    updateReviewRequests(user) {
-        fetch(`/api/review-requests/${user.get('rb_username')}`)
+    updateReviewRequests(userModel) {
+        fetch(`/api/review-requests/${userModel.get('rb_username')}`)
             .then(result => result.json())
             .then(result => {
                 const reviewRequests = [];
@@ -712,77 +710,27 @@ class UserDetail extends React.Component {
             });
     }
 
-    updateStatusReports(user) {
-        const { groups, id } = user.attributes;
-        const dueDates = window.application.get('statusReportDueDates')
-            .filter(d => intersectionExists(d.get('show_to_groups'), groups))
-            .sort((a, b) => a.get('date').isBefore(b.get('date')) ? -1 : 1);
-
-        if (dueDates.length === 0) {
-            this.setState({ statusReports: [] });
-            return;
-        }
-
-        const now = moment();
-        const usersStatusReports = window.application.get('statusReports')
-            .filter(d => d.get('user') === id);
-
-        const statusReports = dueDates.map(dueDate => {
-            const due = dueDate.get('date');
-            const statusReport = usersStatusReports.find(
-                report => report.get('date_due') === dueDate.get('id'));
-
-            if (statusReport) {
-                const dateSubmitted = statusReport.get('date_submitted');
-                const late = due < dateSubmitted;
-                const link = `/status/view/${statusReport.get('id')}`;
-
-                this.events.push({
-                    date: dateSubmitted,
-                    iconFAClass: 'fa-list',
-                    linkURL: link,
-                    summary: late
-                        ? `Status Report (was due ${due.format('ddd. MMM D')})`
-                        : 'Status Report',
-                });
-
-                return {
-                    href: link,
-                    late: late,
-                    text: due.format('D MMM YYYY'),
-                };
-            } else {
-                return {
-                    text: due.format('D MMM YYYY'),
-                    missing: due < now,
-                };
-            }
-        });
-
-        this.setState({
-            events: this.events,
-            statusReports,
-        });
-    }
-
     render() {
-        const { manage } = this.props;
+        const {
+            events,
+            manage,
+            statusReports,
+            user,
+        } = this.props;
         const {
             codeReviews,
-            statusReports,
             reviewRequests,
-            user,
+            userModel,
         } = this.state;
 
-        if (user === null) {
+        if (userModel === null) {
             return <span className="fa fa-refresh fa-spin" />;
         }
 
         const {
-            projects,
-            slack_username: slackUsername,
+            projects: legacyProjects,
             status_reports: legacyStatusReports,
-        } = user.attributes;
+        } = userModel.attributes;
 
         const statusReportsItems = statusReports === null
             ? <span className="fa fa-refresh fa-spin" />
@@ -833,7 +781,7 @@ class UserDetail extends React.Component {
             mode: 'inline',
             showbuttons: 'bottom',
             type: 'textarea',
-            value: user.get('notes'),
+            value: userModel.get('notes'),
             unsavedclass: null,
         };
 
@@ -841,22 +789,22 @@ class UserDetail extends React.Component {
             <div className="user-detail">
                 <UserBio
                     manage={manage}
-                    model={user}
+                    model={userModel}
                 />
                 <SummaryEntry title="Projects">
-                    {(projects && projects.length) ? (
+                    {(legacyProjects && legacyProjects.length) ? (
                         <ModelLinksWrapper
-                            model={user}
+                            model={userModel}
                             property="projects"
                             manage={manage}
                         />
                     ) : (
-                        <Projects user={user} />
+                        <Projects user={userModel} />
                     )}
                 </SummaryEntry>
                 <SummaryEntry title="Demo Videos">
                     <ModelLinksWrapper
-                        model={user}
+                        model={userModel}
                         property="demos"
                         manage={manage}
                     />
@@ -864,7 +812,7 @@ class UserDetail extends React.Component {
                 <SummaryEntry title="Status Reports">
                     {(legacyStatusReports && legacyStatusReports.length) ? (
                         <ModelLinksWrapper
-                            model={user}
+                            model={userModel}
                             property="status_reports"
                             manage={manage}
                         />
@@ -875,13 +823,13 @@ class UserDetail extends React.Component {
                     )}
                 </SummaryEntry>
                 <SummaryEntry title="Chat History">
-                    <ChatHistory slack_username={slackUsername} />
+                    <ChatHistory slack_username={user.slack_username} />
                 </SummaryEntry>
                 <SummaryEntry title="Notes" className="notes-editable">
                     <Editable
                         ref={el => this.notesEl = el}
                         options={notesEditableOptions}
-                        onChange={notes => user.save({ notes }, { wait: true })}
+                        onChange={notes => userModel.save({ notes }, { wait: true })}
                     />
                 </SummaryEntry>
                 <SummaryEntry title="Review Requests">
@@ -895,7 +843,7 @@ class UserDetail extends React.Component {
                     </ul>
                 </SummaryEntry>
                 <SummaryEntry title="Timeline">
-                    <Timeline events={this.state.events} />
+                    <Timeline events={[].concat(events, this.state.events)} />
                 </SummaryEntry>
             </div>
         );
@@ -903,12 +851,68 @@ class UserDetail extends React.Component {
 }
 
 
-export default connect((state, props) => {
+const mapStateToProps = (state, props) => {
     const {
         manage,
+        statusReports,
+        statusReportDueDates,
+        users,
     } = state;
 
+    const slackUsername = props.match.params.userId;
+    const user = users.items.find(user => user.slack_username === slackUsername);
+    const events = [];
+    let usersStatusReports = null;
+
+    if (user) {
+        const usersGroups = new Set(user.groups);
+        const now = moment();
+        const usersDueDates = statusReportDueDates.items
+            .filter(dueDate => intersectionExists(new Set(dueDate.show_to_groups), usersGroups))
+            .sort((a, b) => a.date.localeCompare(b))
+            .reverse();
+
+        const filteredStatusReports = statusReports.items
+            .filter(report => report.user === user._id);
+
+        usersStatusReports = usersDueDates.map(dueDate => {
+            const statusReport = filteredStatusReports.find(
+                report => report.date_due === dueDate._id);
+            const due = moment(dueDate.date);
+
+            if (statusReport) {
+                const dateSubmitted = moment(statusReport.date_submitted);
+                const late = due < dateSubmitted;
+                const link = `/status/view/${statusReport._id}`;
+
+                events.push({
+                    date: dateSubmitted,
+                    iconFAClass: 'fa-list',
+                    linkURL: link,
+                    summary: late
+                        ? `Status Report (was due ${due.format('ddd. MMM D')})`
+                        : 'Status Report',
+                });
+
+                return {
+                    href: link,
+                    late: late,
+                    text: due.format('D MMM YYYY'),
+                }
+            } else {
+                return {
+                    text: due.format('D MMM YYYY'),
+                    missing: due < now,
+                };
+            }
+        });
+    }
+
     return {
+        events,
         manage,
+        statusReports: usersStatusReports,
+        user,
     };
-})(UserDetail);
+};
+export default connect(mapStateToProps)(UserDetail);

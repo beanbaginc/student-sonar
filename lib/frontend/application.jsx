@@ -4,6 +4,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
+import { fetchStatusReportDueDates } from './redux/modules/status-report-due-dates';
+import { fetchStatusReports } from './redux/modules/status-reports';
 import { fetchUsers } from './redux/modules/users';
 import AllStatusReports from './all-status-reports';
 import AllUsers from './all-users';
@@ -39,6 +41,8 @@ const PermissionDenied = props => (
 class Application extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
+        dispatch(fetchStatusReportDueDates());
+        dispatch(fetchStatusReports());
         dispatch(fetchUsers());
     }
 

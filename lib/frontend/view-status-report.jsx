@@ -1,11 +1,12 @@
 // jshint ignore: start
 
-import marked from 'marked';
 import moment from 'moment';
 import React from 'react';
+import { connect } from 'react-redux';
+import showdown from 'showdown';
 
 
-export default class ViewStatusReport extends React.Component {
+class ViewStatusReport extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
@@ -24,46 +25,61 @@ export default class ViewStatusReport extends React.Component {
     }
 
     render() {
-        const { match, model } = this.props;
-        const report = model.get('statusReports').get(match.params.reportId);
+        const {
+            dueDate,
+            report,
+            user,
+        } = this.props;
 
         let data = null;
 
         if (report) {
-            const dueDate = model.get('statusReportDueDates').get(
-                report.get('date_due'));
-            const user = model.get('users').get(report.get('user'));
-
             // TODO: show error + raw text if markdown fails
-            marked.setOptions({
-                gfm: true,
-                breaks: true,
-                sanitize: true,
-                smartLists: true,
-                smartypants: true
-            });
+            const converter = new showdown.Converter();
+            converter.setFlavor('github');
 
-            const content = { __html: marked(report.get('text')) };
+            const content = { __html: converter.makeHtml(report.text) };
 
             data = (
                 <React.Fragment>
                     <div className="page-header">
                         <h1>
-                            Status Report for {dueDate.get('date').format('ddd, MMM D')}
-                            <span className="small">{user.get('name')}</span>
+                            Status Report for {moment(dueDate.date).format('ddd, MMM D')}
+                            <span className="small">{user.name}</span>
                         </h1>
                     </div>
                     <div dangerouslySetInnerHTML={content} />
                 </React.Fragment>
-            );
-        } else if (model.get('ready')) {
-            data = (
-                <div className="page-header">
-                    <h1>Not Found</h1>
-                </div>
             );
         }
 
         return <div className="view-status-report content-inner">{data}</div>;
     }
 }
+
+
+const mapStateToProps = (state, props) => {
+    const {
+        statusReportDueDates,
+        statusReports,
+        users,
+    } = state;
+
+    const report = statusReports.items
+        .find(report => report._id === props.match.params.reportId);
+    let dueDate = null;
+    let user = null;
+
+    if (report) {
+        dueDate = statusReportDueDates.items
+            .find(dueDate => dueDate._id === report.date_due);
+        user = users.items.find(user => user._id === report.user);
+    }
+
+    return {
+        dueDate,
+        report,
+        user,
+    };
+};
+export default connect(mapStateToProps)(ViewStatusReport);

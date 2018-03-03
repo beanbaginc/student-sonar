@@ -2,12 +2,13 @@
 
 import moment from 'moment';
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {intersectionExists} from './util';
 
 
-export default class MyStatusReports extends React.Component {
+class MyStatusReports extends React.Component {
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
@@ -26,16 +27,15 @@ export default class MyStatusReports extends React.Component {
     }
 
     render() {
-        const { model } = this.props;
+        const { model, myUser } = this.props;
 
-        if (!model.get('ready')) {
+        if (myUser === null) {
             return null;
         }
 
-        const me = model.get('me');
         const statusReports = model.get('statusReports')
             .filter(d => d.get('user') === window.userId);
-        const myGroups = me.get('groups');
+        const myGroups = new Set(myUser.groups);
         const now = moment();
 
         const dueDates = model.get('statusReportDueDates')
@@ -84,3 +84,9 @@ export default class MyStatusReports extends React.Component {
         );
     }
 }
+
+
+const mapStateToProps = state => ({
+    myUser: state.users.myUser,
+});
+export default connect(mapStateToProps)(MyStatusReports);
