@@ -50,5 +50,5 @@ gulp.task('images', function() {
 });
 
 gulp.task('default', ['clean'], function() {
-    gulp.start('html', 'webpack', 'css', 'preview-css', 'images');
+    gulp.start('html', 'webpack', 'css', 'images');
 });
