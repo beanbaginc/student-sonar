@@ -3,7 +3,6 @@ var fs = require('fs'),
     autoprefixer = require('gulp-autoprefixer'),
     del = require('del'),
     htmlreplace = require('gulp-html-replace'),
-    image = require('gulp-image'),
     less = require('gulp-less'),
     minifycss = require('gulp-minify-css'),
     rename = require('gulp-rename'),
@@ -45,7 +44,6 @@ gulp.task('css', function() {
 
 gulp.task('images', function() {
     return gulp.src('images/*')
-        //.pipe(image())
         .pipe(gulp.dest('build/images/'));
 });
 
