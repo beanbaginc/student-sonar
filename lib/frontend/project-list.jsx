@@ -55,7 +55,7 @@ class ProjectList extends React.Component {
             return {
                 id: section.id,
                 name,
-                tasks: section.tasks,
+                tasks: section.tasks.filter(task => task.completed === false),
             };
         });
 
