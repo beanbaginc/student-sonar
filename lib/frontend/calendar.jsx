@@ -3,6 +3,7 @@
 import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 
 import Confirm from './confirm';
@@ -337,6 +338,9 @@ class Calendar extends React.Component {
 
         return (
             <div className="calendar">
+                <Helmet>
+                    <title>Calendar - Student Sonar</title>
+                </Helmet>
                 <ul className="event-list">{dates}</ul>
                 {manage && (
                     <button

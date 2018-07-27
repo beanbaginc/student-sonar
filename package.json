@@ -58,6 +58,7 @@
     "passport-slack": "0.0.1",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
+    "react-helmet": "^5.2.0",
     "react-mde": "^2.3.4",
     "react-redux": "^5.0.7",
     "react-router-dom": "^4.3.1",

@@ -1,6 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
+import Helmet from 'react-helmet';
 import { Link } from 'react-router-dom';
 
 
@@ -50,6 +51,9 @@ export default class AllUsers extends React.Component {
 
         return (
             <div className="all-users content-inner">
+                <Helmet>
+                    <title>All Users - Student Sonar</title>
+                </Helmet>
                 <div className="panel panel-default">
                     <div className="panel-heading">All Users</div>
                     <table className="table table-hover">

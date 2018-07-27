@@ -4,6 +4,7 @@ import CalendarHeatmap from 'cal-heatmap';
 import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import showdown from 'showdown';
 import { Link } from 'react-router-dom';
@@ -723,7 +724,7 @@ class UserDetail extends React.Component {
             userModel,
         } = this.state;
 
-        if (userModel === null) {
+        if (userModel === null || !user) {
             return <span className="fa fa-refresh fa-spin" />;
         }
 
@@ -787,6 +788,9 @@ class UserDetail extends React.Component {
 
         return (
             <div className="user-detail">
+                <Helmet>
+                    <title>{user.name} - Student Sonar</title>
+                </Helmet>
                 <UserBio
                     manage={manage}
                     model={userModel}

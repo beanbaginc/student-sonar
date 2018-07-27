@@ -1,6 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 
 import { fetchProjects } from './redux/modules/projects';
@@ -60,25 +61,30 @@ class ProjectList extends React.Component {
         });
 
         return (
-            <ScrollSpy
-                className="project-list"
-                content="#ideas-container"
-                nav="#ideas-nav">
-                <div className="content-inner" id="ideas-container">
-                    <div id="ideas">
-                        {sections.map(section =>
-                            <ProjectSection key={section.id} {...section} />
-                        )}
+            <React.Fragment>
+                <Helmet>
+                    <title>Project Ideas - Student Sonar</title>
+                </Helmet>
+                <ScrollSpy
+                    className="project-list"
+                    content="#ideas-container"
+                    nav="#ideas-nav">
+                    <div className="content-inner" id="ideas-container">
+                        <div id="ideas">
+                            {sections.map(section =>
+                                <ProjectSection key={section.id} {...section} />
+                            )}
+                        </div>
                     </div>
-                </div>
-                <nav id="ideas-nav-container">
-                    <ul className="nav" id="ideas-nav">
-                        {sections.map(section =>
-                            <NavSection key={section.id} {...section} />
-                        )}
-                    </ul>
-                </nav>
-            </ScrollSpy>
+                    <nav id="ideas-nav-container">
+                        <ul className="nav" id="ideas-nav">
+                            {sections.map(section =>
+                                <NavSection key={section.id} {...section} />
+                            )}
+                        </ul>
+                    </nav>
+                </ScrollSpy>
+            </React.Fragment>
         );
     }
 }

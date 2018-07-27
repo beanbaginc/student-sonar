@@ -1,6 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 
 import { fetchProjects } from './redux/modules/projects';
@@ -14,7 +15,7 @@ class ProjectSingle extends React.Component {
     }
 
     render() {
-        const { isFetching, match, projects } = this.props;
+        const { isFetching, task } = this.props;
 
         if (isFetching) {
             return (
@@ -24,12 +25,11 @@ class ProjectSingle extends React.Component {
             );
         }
 
-        const task = Object.values(projects)
-            .map(section => section.tasks.find(task => task.id == match.params.taskId))
-            .reduce((accumulator, value) => value || accumulator, null);
-
         return task && (
             <div id="ideas" className="content-inner">
+                <Helmet>
+                    <title>{task.name} - Student Sonar</title>
+                </Helmet>
                 <Project {...task}>{task.html}</Project>
             </div>
         );
@@ -37,15 +37,19 @@ class ProjectSingle extends React.Component {
 }
 
 
-function mapStateToProps(state) {
+const mapStateToProps = (state, props) => {
     const { projects } = state;
-    const { isFetching, items } = projects;
+
+    const task = Object.values(projects.items)
+        .map(section => section.tasks.find(task => task.id == props.match.params.taskId))
+        .reduce((accumulator, value) => value || accumulator, null);
+
 
     return {
-        isFetching,
-        projects: items,
+        isFetching: projects.isFetching,
+        task: task,
     };
-}
+};
 
 
 export default connect(mapStateToProps)(ProjectSingle);

@@ -2,6 +2,7 @@
 
 import moment from 'moment';
 import React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import showdown from 'showdown';
 
@@ -39,12 +40,16 @@ class ViewStatusReport extends React.Component {
             converter.setFlavor('github');
 
             const content = { __html: converter.makeHtml(report.text) };
+            const dateString = moment(dueDate.date).format('ddd, MMM D');
 
             data = (
                 <React.Fragment>
+                    <Helmet>
+                        <title>Status Report for {user.name} {dateString} - Student Sonar</title>
+                    </Helmet>
                     <div className="page-header">
                         <h1>
-                            Status Report for {moment(dueDate.date).format('ddd, MMM D')}
+                            Status Report for {dateString}
                             <span className="small">{user.name}</span>
                         </h1>
                     </div>

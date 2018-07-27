@@ -2,6 +2,7 @@
 
 import moment from 'moment';
 import React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -233,6 +234,9 @@ class AllStatusReports extends React.Component {
 
         return (
             <div className="all-status-reports content-inner">
+                <Helmet>
+                    <title>All Status Reports - Student Sonar</title>
+                </Helmet>
                 <div className="panel panel-default">
                     <div className="panel-heading">All Status Reports</div>
                     <table className="table">

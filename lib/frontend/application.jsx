@@ -1,6 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
+import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
@@ -53,6 +54,9 @@ class Application extends React.Component {
         return (
             <BrowserRouter>
                 <React.Fragment>
+                    <Helmet>
+                        <title>Student Sonar</title>
+                    </Helmet>
                     <Header
                         loggedIn={loggedIn}
                         isMentor={isMentor}
