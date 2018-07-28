@@ -1,36 +1,21 @@
 const webpack = require('webpack');
 const path = require('path');
 
-const plugins = [
-    new webpack.DefinePlugin({
-        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-    }),
-    new webpack.ProvidePlugin({
-        'jQuery': 'jquery',
-        '$': 'jquery',
-        'window.jQuery': 'jquery',
-        'window.$': 'jquery',
-    }),
-    new webpack.optimize.OccurrenceOrderPlugin(),
-];
-
-if (process.env.NODE_ENV === 'production') {
-    plugins.push(new webpack.optimize.UglifyJsPlugin());
-}
 
 module.exports = {
+    mode: 'production',
     entry: path.join(__dirname, 'lib', 'frontend', 'main.js'),
     output: {
         path: path.join(__dirname, 'build', 'scripts'),
         filename: 'bundle.js',
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.js(x*)$/,
                 exclude: /node_modules/,
                 loader: 'babel-loader',
-                query: {
+                options: {
                     cacheDirectory: 'babel-cache',
                     presets: ['react', 'env'],
                     plugins: ['transform-class-properties', 'dedent'],
@@ -60,8 +45,15 @@ module.exports = {
             },
         ],
     },
-    devtool: 'eval-source-map',
-    plugins: plugins,
+    devtool: 'source-map',
+    plugins: [
+        new webpack.ProvidePlugin({
+            'jQuery': 'jquery',
+            '$': 'jquery',
+            'window.jQuery': 'jquery',
+            'window.$': 'jquery',
+        }),
+    ],
     resolve: {
         extensions: ['.js', '.jsx'],
     },
