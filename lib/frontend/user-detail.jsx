@@ -139,7 +139,7 @@ class Links extends React.Component {
                             type="button"
                             className="delete-button btn btn-default btn-xs"
                             onClick={() => this.deleteLink(i)}>
-                            <span className="fa fa-trash-o"></span>
+                            <span className="fas fa-trash-alt"></span>
                         </button>
                     )}
                 </li>
@@ -437,7 +437,7 @@ class Timeline extends React.Component {
                         <li key={`${key}-${i}`}>
                             <a href={event.linkURL}>
                                 {event.iconURL && <img src={event.iconURL} width="16" height="16" alt="" />}
-                                {event.iconFAClass && <span className={`fa ${event.iconFAClass}`}></span>}
+                                {event.iconFAClass && <span className={`fas ${event.iconFAClass}`}></span>}
                                 {event.summary}
                             </a>
                             {event.details && (
@@ -470,7 +470,7 @@ class Projects extends React.Component {
         const { isFetching, projects, user } = this.props;
 
         if (isFetching) {
-            return <span className="fa fa-refresh fa-spin" />;
+            return <span className="fas fa-sync fa-spin" />;
         }
 
         const email = user.get('email');
@@ -725,7 +725,7 @@ class UserDetail extends React.Component {
         } = this.state;
 
         if (userModel === null || !user) {
-            return <span className="fa fa-refresh fa-spin" />;
+            return <span className="fas fa-sync fa-spin" />;
         }
 
         const {
@@ -734,7 +734,7 @@ class UserDetail extends React.Component {
         } = userModel.attributes;
 
         const statusReportsItems = statusReports === null
-            ? <span className="fa fa-refresh fa-spin" />
+            ? <span className="fas fa-sync fa-spin" />
             : statusReports.map(statusReport => (
                 <li key={`${statusReport.href}-${statusReport.text}`}>
                     {statusReport.href ? (
@@ -752,7 +752,7 @@ class UserDetail extends React.Component {
             ));
 
         const reviewRequestItems = reviewRequests === null
-            ? <span className="fa fa-refresh fa-spin" />
+            ? <span className="fas fa-sync fa-spin" />
             : reviewRequests.map(reviewRequest => (
                 <li key={reviewRequest.id}>
                     <a href={reviewRequest.href}>
@@ -764,7 +764,7 @@ class UserDetail extends React.Component {
             ));
 
         const codeReviewItems = codeReviews === null
-            ? <span className="fa fa-refresh fa-spin" />
+            ? <span className="fas fa-sync fa-spin" />
             : codeReviews.map(codeReview => (
                 <li key={codeReview.id}>
                     <a href={codeReview.href}>{codeReview.summary}</a>
@@ -891,7 +891,7 @@ const mapStateToProps = (state, props) => {
 
                 events.push({
                     date: dateSubmitted,
-                    iconFAClass: 'fa-list',
+                    iconFAClass: 'fa-list-ul',
                     linkURL: link,
                     summary: late
                         ? `Status Report (was due ${due.format('ddd. MMM D')})`

@@ -45,7 +45,7 @@ class ProjectList extends React.Component {
         if (this.props.isFetching) {
             return (
                 <div className="spinner">
-                    <span className="fa fa-refresh fa-spin"></span>
+                    <span className="fas fa-sync fa-spin"></span>
                 </div>
             );
         }

@@ -97,7 +97,7 @@ class RowView extends React.Component {
                             className="btn btn-default btn-xs"
                             onClick={this.onDeleteClicked}
                             ref={el => this.$deleteButton = el ? $(el) : $()}>
-                            <span className="fa fa-trash-o"></span>
+                            <span className="fas fa-trash-alt"></span>
                         </button>
                     )}
                 </td>

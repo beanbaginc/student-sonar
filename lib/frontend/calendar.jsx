@@ -47,7 +47,7 @@ class ModalDialog extends React.Component {
                     <div className="modal-content">
                         <div className="modal-header">
                             <button type="button" className="close" data-dismiss="modal">
-                                <span className="fa fa-close"></span>
+                                <span className="fas fa-times"></span>
                             </button>
                             <h4 className="modal-title">
                                 {this.props.title}
@@ -234,14 +234,14 @@ class CalendarEntry extends React.Component {
                             id="edit-button"
                             className="btn btn-default btn-xs"
                             onClick={() => this.setState({ edit: true })}>
-                            <span className="fa fa-edit"></span>
+                            <span className="fas fa-edit"></span>
                         </button>
                         <button
                             type="button"
                             id="delete-button"
                             className="btn btn-default btn-xs"
                             onClick={this.onDeleteClicked}>
-                            <span className="fa fa-trash-o"></span>
+                            <span className="fas fa-trash-alt"></span>
                         </button>
                     </div>
                 )}
