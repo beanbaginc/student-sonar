@@ -28,14 +28,14 @@ class MyStatusReports extends React.Component {
     }
 
     render() {
-        const { model, myUser } = this.props;
+        const { model, myUser, statusReports } = this.props;
 
         if (myUser === null) {
             return null;
         }
 
-        const statusReports = model.get('statusReports')
-            .filter(d => d.get('user') === window.userId);
+        const myStatusReports = statusReports.items.filter(
+            report => report.user === myUser._id);
         const myGroups = new Set(myUser.groups);
         const now = moment();
 
@@ -44,7 +44,7 @@ class MyStatusReports extends React.Component {
             .sort((a, b) => a.get('date').isBefore(b.get('date')) ? -1 : 1)
             .map(dueDate => {
                 const dueDateId = dueDate.get('id');
-                const report = statusReports.find(d => d.get('date_due') === dueDateId);
+                const report = myStatusReports.find(d => d.date_due === dueDateId);
                 const date = dueDate.get('date');
                 const daysLeft = date.diff(now, 'days', true);
 
@@ -92,5 +92,6 @@ class MyStatusReports extends React.Component {
 
 const mapStateToProps = state => ({
     myUser: state.users.myUser,
+    statusReports: state.statusReports,
 });
 export default connect(mapStateToProps)(MyStatusReports);

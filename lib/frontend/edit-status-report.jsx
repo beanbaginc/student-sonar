@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 
 import ToggleSwitch from './toggle-switch';
 import { saveStatusReport } from './redux/modules/status-reports';
-import * as models from './models';
 
 
 class EditStatusReport extends React.Component {

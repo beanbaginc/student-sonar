@@ -182,14 +182,13 @@ class AllStatusReports extends React.Component {
     }
 
     render() {
-        const { groups, manage, model } = this.props;
+        const { groups, manage, model, statusReports } = this.props;
 
         const activeGroupIds = new Set(
             groups.items
                 .filter(group => group.show)
                 .map(group => group.group_id));
 
-        const statusReports = model.get('statusReports');
         const allUsers = model.get('users');
 
         const dueDates = this.statusReportDueDates
@@ -205,7 +204,7 @@ class AllStatusReports extends React.Component {
                     .chain()
                     .filter(user => intersectionExists(showTo, user.get('groups')))
                     .map(user => {
-                        const report = statusReports.findWhere({
+                        const report = _.findWhere(statusReports.items, {
                             date_due: dueDateId,
                             user: user.get('id'),
                         });
@@ -213,7 +212,7 @@ class AllStatusReports extends React.Component {
                         return {
                             avatar: user.get('avatar'),
                             name: user.get('name'),
-                            report: report && report.get('id'),
+                            report: report && report._id,
                         };
                     })
                     .value();
@@ -276,6 +275,7 @@ class AllStatusReports extends React.Component {
 const mapStateToProps = state => ({
     groups: state.groups,
     manage: state.manage,
+    statusReports: state.statusReports,
 });
 
 
