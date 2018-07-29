@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 
 module.exports = {
@@ -53,6 +54,11 @@ module.exports = {
             'window.jQuery': 'jquery',
             'window.$': 'jquery',
         }),
+        new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            openAnalyzer: false,
+        }),
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     ],
     resolve: {
         extensions: ['.js', '.jsx'],
