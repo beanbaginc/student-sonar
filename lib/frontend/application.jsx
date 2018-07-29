@@ -5,6 +5,7 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
+import { fetchGroups } from './redux/modules/groups';
 import { fetchStatusReportDueDates } from './redux/modules/status-report-due-dates';
 import { fetchStatusReports } from './redux/modules/status-reports';
 import { fetchUsers } from './redux/modules/users';
@@ -42,6 +43,7 @@ const PermissionDenied = props => (
 class Application extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
+        dispatch(fetchGroups());
         dispatch(fetchStatusReportDueDates());
         dispatch(fetchStatusReports());
         dispatch(fetchUsers());

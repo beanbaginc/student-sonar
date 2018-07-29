@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
+import _ from 'underscore';
 
 import Confirm from './confirm';
 import {
@@ -80,7 +81,7 @@ class ModalDialog extends React.Component {
 }
 
 
-class EditCalendarEntry extends React.Component {
+class EditCalendarEntryInt extends React.Component {
     constructor(props) {
         super(props);
         this.onDateChanged = this.onDateChanged.bind(this);
@@ -105,12 +106,16 @@ class EditCalendarEntry extends React.Component {
             })
             .on('change', this.onDateChanged);
 
+        const groups = _.pluck(this.props.groups.items, 'group_id').sort();
+
         this.$groups
             .selectize({
                 create: true,
                 delimeter: ',',
-                options: window.application.get('groups').pluck('group_id').map(
-                    group => ({ text: group, value: group })),
+                options: groups.map(group => ({
+                    text: group,
+                    value: group,
+                })),
                 plugins: ['remove_button'],
             })
             .on('change', this.onGroupsChanged);
@@ -201,6 +206,9 @@ class EditCalendarEntry extends React.Component {
         );
     }
 }
+
+
+const EditCalendarEntry = connect(state => ({ groups: state.groups }))(EditCalendarEntryInt);
 
 
 class CalendarEntry extends React.Component {

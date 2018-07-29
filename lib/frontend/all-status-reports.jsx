@@ -5,6 +5,7 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import _ from 'underscore';
 
 import Confirm from './confirm';
 import Editable from './editable';
@@ -72,7 +73,7 @@ class RowView extends React.Component {
             selectize: {
                 create: true,
                 delimiter: ',',
-                options: this.props.getGroups().pluck('group_id').map(
+                options: _.pluck(this.props.getGroups(), 'group_id').map(
                     group => ({ text: group, value: group })),
                 plugins: ['remove_button'],
             },
@@ -181,13 +182,12 @@ class AllStatusReports extends React.Component {
     }
 
     render() {
-        const { model, manage } = this.props;
+        const { groups, manage, model } = this.props;
 
-        const allGroups = model.get('groups');
         const activeGroupIds = new Set(
-            allGroups
-                .filter(group => group.get('show'))
-                .map(group => group.get('group_id')));
+            groups.items
+                .filter(group => group.show)
+                .map(group => group.group_id));
 
         const statusReports = model.get('statusReports');
         const allUsers = model.get('users');
@@ -225,7 +225,7 @@ class AllStatusReports extends React.Component {
                         manage={manage}
                         users={users}
                         onDateChanged={date => dueDate.save({ date })}
-                        getGroups={() => allGroups}
+                        getGroups={() => groups}
                         getGroupsString={() => dueDate.getGroupsString()}
                         onGroupsChanged={show_to_groups => dueDate.save({ show_to_groups })}
                     />
@@ -273,4 +273,10 @@ class AllStatusReports extends React.Component {
 }
 
 
-export default connect(state => ({ manage: state.manage }))(AllStatusReports);
+const mapStateToProps = state => ({
+    groups: state.groups,
+    manage: state.manage,
+});
+
+
+export default connect(mapStateToProps)(AllStatusReports);

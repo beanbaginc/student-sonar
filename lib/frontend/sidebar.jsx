@@ -1,6 +1,7 @@
 // jshint ignore: start
 
 import React from 'react';
+import { connect } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 
 
@@ -24,7 +25,7 @@ class SidebarItem extends React.Component {
 }
 
 
-export default class Sidebar extends React.Component {
+class Sidebar extends React.Component {
     constructor(props) {
         super(props);
 
@@ -32,37 +33,36 @@ export default class Sidebar extends React.Component {
     }
 
     render() {
-        const { loggedIn, isMentor, model } = this.props;
+        const { groups, loggedIn, isMentor, model } = this.props;
 
         let myStudentsItems = [];
         let groupsItems = null;
 
         if (isMentor) {
             const allUsers = model.get('users');
-            const groups = model.get('groups')
-                .filter(group => group.get('show'));
 
-            groupsItems = groups.map(group => {
-                const groupId = group.get('group_id');
-                const users = allUsers.filter(user =>
-                    user.get('type') === 'student' &&
-                    user.get('groups').has(groupId));
+            groupsItems = groups.items
+                .filter(group => group.show)
+                .map(group => {
+                    const users = allUsers.filter(user =>
+                        user.get('type') === 'student' &&
+                        user.get('groups').has(group.group_id));
 
-                users.forEach(user => {
-                    if (user.get('primary_mentor') === window.userId) {
-                        myStudentsItems.push(
-                            <SidebarItem
-                                key={user.get('id')}
-                                to={`/users/${user.get('slack_username')}`}
-                                icon={user.get('avatar')}
-                                label={user.get('name')}
-                            />);
-                    }
-                });
+                    users.forEach(user => {
+                        if (user.get('primary_mentor') === window.userId) {
+                            myStudentsItems.push(
+                                <SidebarItem
+                                    key={user.get('id')}
+                                    to={`/users/${user.get('slack_username')}`}
+                                    icon={user.get('avatar')}
+                                    label={user.get('name')}
+                                />);
+                        }
+                    });
 
                 return (
-                    <li key={group.get('id')}>
-                        <div>{group.get('name')}</div>
+                    <li key={group.id}>
+                        <div>{group.name}</div>
                         <ul className="nav nav-sidebar">
                             {users.map(user => (
                                 <SidebarItem
@@ -100,3 +100,10 @@ export default class Sidebar extends React.Component {
         );
     }
 }
+
+
+const mapStateToProps = state => ({
+    groups: state.groups,
+});
+
+export default connect(mapStateToProps)(Sidebar);

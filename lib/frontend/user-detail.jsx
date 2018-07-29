@@ -237,13 +237,13 @@ class ModelLinksWrapper extends React.Component {
 }
 
 
-class UserBio extends React.Component {
+class UserBioInt extends React.Component {
     render() {
-        const { model, manage } = this.props;
+        const { groups, model, manage } = this.props;
         const {
             avatar,
             email,
-            groups,
+            groups: userGroups,
             name,
             primary_mentor,
             rb_username,
@@ -335,9 +335,13 @@ class UserBio extends React.Component {
             selectize: {
                 create: true,
                 delimiter: ',',
-                options: window.application.get('groups')
-                    .pluck('group_id')
-                    .map(group => ({ text: group, value: group })),
+                options: groups.items
+                    .map(group => group.group_id)
+                    .sort()
+                    .map(group => ({
+                        text: group,
+                        value: group,
+                    })),
                 plugins: ['remove_button'],
             },
             unsavedclass: null,
@@ -391,7 +395,7 @@ class UserBio extends React.Component {
                             <dd>
                                 <Editable
                                     options={groupsEditableOptions}
-                                    onChange={groups => model.save({ groups: new Set(groups.split(',')) }, saveOptions)}
+                                    onChange={userGroups => model.save({ groups: new Set(userGroups.split(',')) }, saveOptions)}
                                 />
                             </dd>
 
@@ -415,6 +419,12 @@ class UserBio extends React.Component {
         );
     }
 }
+
+
+const UserBio = connect(state => ({
+    groups: state.groups,
+    manage: state.manage,
+}))(UserBioInt);
 
 
 class Timeline extends React.Component {
@@ -791,10 +801,7 @@ class UserDetail extends React.Component {
                 <Helmet>
                     <title>{user.name} - Student Sonar</title>
                 </Helmet>
-                <UserBio
-                    manage={manage}
-                    model={userModel}
-                />
+                <UserBio model={userModel} />
                 <SummaryEntry title="Projects">
                     {(legacyProjects && legacyProjects.length) ? (
                         <ModelLinksWrapper
