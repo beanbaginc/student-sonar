@@ -28,34 +28,30 @@ class SidebarItem extends React.Component {
 class Sidebar extends React.Component {
     constructor(props) {
         super(props);
-
-        props.model.on('ready', () => this.forceUpdate());
     }
 
     render() {
-        const { groups, loggedIn, isMentor, model } = this.props;
+        const { groups, loggedIn, isMentor, users } = this.props;
 
         let myStudentsItems = [];
         let groupsItems = null;
 
         if (isMentor) {
-            const allUsers = model.get('users');
-
             groupsItems = groups.items
                 .filter(group => group.show)
                 .map(group => {
-                    const users = allUsers.filter(user =>
-                        user.get('type') === 'student' &&
-                        user.get('groups').has(group.group_id));
+                    const groupUsers = users.items.filter(user =>
+                        user.type === 'student' &&
+                        user.groups.includes(group.group_id));
 
-                    users.forEach(user => {
-                        if (user.get('primary_mentor') === window.userId) {
+                    groupUsers.forEach(user => {
+                        if (user.primary_mentor === window.userId) {
                             myStudentsItems.push(
                                 <SidebarItem
-                                    key={user.get('id')}
-                                    to={`/users/${user.get('slack_username')}`}
-                                    icon={user.get('avatar')}
-                                    label={user.get('name')}
+                                    key={user._id}
+                                    to={`/users/${user.slack_username}`}
+                                    icon={user.avatar}
+                                    label={user.name}
                                 />);
                         }
                     });
@@ -64,12 +60,12 @@ class Sidebar extends React.Component {
                     <li key={group.id}>
                         <div>{group.name}</div>
                         <ul className="nav nav-sidebar">
-                            {users.map(user => (
+                            {groupUsers.map(user => (
                                 <SidebarItem
-                                    key={user.get('id')}
-                                    to={`/users/${user.get('slack_username')}`}
-                                    icon={user.get('avatar')}
-                                    label={user.get('name')}
+                                    key={user._id}
+                                    to={`/users/${user.slack_username}`}
+                                    icon={user.avatar}
+                                    label={user.name}
                                 />
                             ))}
                         </ul>
@@ -104,6 +100,7 @@ class Sidebar extends React.Component {
 
 const mapStateToProps = state => ({
     groups: state.groups,
+    users: state.users,
 });
 
 export default connect(mapStateToProps)(Sidebar);

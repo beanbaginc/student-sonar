@@ -50,7 +50,7 @@ class Application extends React.Component {
     }
 
     render() {
-        const { loggedIn, model, userType } = this.props;
+        const { loggedIn, userType } = this.props;
         const isMentor = (userType === 'mentor');
 
         return (
@@ -66,7 +66,6 @@ class Application extends React.Component {
                     <Sidebar
                         loggedIn={loggedIn}
                         isMentor={isMentor}
-                        model={model}
                     />
                     <div className="main">
                         <Route
@@ -84,13 +83,13 @@ class Application extends React.Component {
                         <Route
                             path="/projects" exact
                             render={props => (
-                                <ProjectList model={model} {...props} />
+                                <ProjectList {...props} />
                             )}
                         />
                         <Route
                             path="/projects/:taskId" exact
                             render={props => (
-                                <SingleProject model={model} {...props} />
+                                <SingleProject {...props} />
                             )}
                         />
                         <Route
@@ -98,7 +97,7 @@ class Application extends React.Component {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <MyStatusReports model={model} {...props} />
+                                        <MyStatusReports {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -110,7 +109,7 @@ class Application extends React.Component {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <AllStatusReports model={model} {...props} />
+                                        <AllStatusReports {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -122,7 +121,7 @@ class Application extends React.Component {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <EditStatusReport model={model} {...props} />
+                                        <EditStatusReport {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -134,7 +133,7 @@ class Application extends React.Component {
                             render={props => (
                                 <React.Fragment>
                                     {loggedIn ? (
-                                        <ViewStatusReport model={model} {...props} />
+                                        <ViewStatusReport {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}
@@ -146,7 +145,7 @@ class Application extends React.Component {
                             render={props => (
                                 <React.Fragment>
                                     {isMentor ? (
-                                        <AllUsers model={model} {...props} />
+                                        <AllUsers {...props} />
                                     ) : (
                                         <PermissionDenied loggedIn={loggedIn} />
                                     )}

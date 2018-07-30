@@ -8,23 +8,6 @@ import showdown from 'showdown';
 
 
 class ViewStatusReport extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    componentDidMount() {
-        this.props.model.on('ready', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
-    }
-
     render() {
         const {
             dueDate,

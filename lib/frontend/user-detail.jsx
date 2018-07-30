@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import _ from 'underscore';
 
 import { fetchProjects } from './redux/modules/projects';
+import { saveUser } from './redux/modules/users';
 import Editable from './editable';
 import { intersectionExists } from './util';
 
@@ -205,53 +206,9 @@ class Links extends React.Component {
 }
 
 
-class ModelLinksWrapper extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleUpdate = this.handleUpdate.bind(this);
-    }
-
-    componentDidMount() {
-        this.props.model.on(`change:${this.props.property}`, this.handleUpdate);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off(`change:${this.props.property}`, this.handleUpdate);
-    }
-
-    handleUpdate() {
-        this.forceUpdate();
-    }
-
-    render() {
-        const { model, property, manage } = this.props;
-
-        return (
-            <Links
-                items={model.get(property) || []}
-                onChange={links => model.save({ [property]: links }, { wait: true })}
-                manage={manage}
-            />
-        );
-    }
-}
-
-
 class UserBioInt extends React.Component {
     render() {
-        const { groups, model, manage } = this.props;
-        const {
-            avatar,
-            email,
-            groups: userGroups,
-            name,
-            primary_mentor,
-            rb_username,
-            school,
-            slack_username,
-            timezone,
-        } = model.attributes;
-        const saveOptions = { wait: true };
+        const { groups, manage, users, user } = this.props;
 
         // school editor
         const schoolEditableOptions = {
@@ -273,16 +230,16 @@ class UserBioInt extends React.Component {
             mode: 'inline',
             type: 'text',
             unsavedclass: null,
-            value: email,
+            value: user.email,
         };
 
         // primary mentor editor
-        const mentors = window.application.get('users')
-            .filter(user => user.get('type') === 'mentor')
+        const mentors = users.items
+            .filter(user => user.type === 'mentor')
             .map(user => ({
-                id: user.id,
-                avatar: user.get('avatar'),
-                name: user.get('name'),
+                id: user._id,
+                avatar: user.avatar,
+                name: user.name,
             }));
 
         const formatMentor = data => dedent`
@@ -313,10 +270,10 @@ class UserBioInt extends React.Component {
                 const mentor = mentors.find(i => i.id === value);
                 $(this).html(mentor ? formatMentor(mentor) : '');
             },
-            value: primary_mentor,
+            value: user.primary_mentor,
         };
 
-        const initialMentorValue = mentors.find(i => i.id === primary_mentor);
+        const initialMentorValue = mentors.find(i => i.id === user.primary_mentor);
 
         // rb username editor
         const rbUsernameEditableOptions = {
@@ -324,7 +281,7 @@ class UserBioInt extends React.Component {
             mode: 'inline',
             type: 'text',
             unsavedclass: null,
-            value: rb_username,
+            value: user.rb_username,
         };
 
         // groups editor
@@ -359,32 +316,32 @@ class UserBioInt extends React.Component {
                             .appendTo($el));
                 }
             },
-            value: model.getGroupsString.bind(model),
+            value: () => user.groups.join(','),
         };
 
 
         return (
             <React.Fragment>
                 <div className="bio">
-                    <img className="avatar" src={avatar} alt="" />
-                    <div className="bio-entry"><span id="name">{name}</span></div>
+                    <img className="avatar" src={user.avatar} alt="" />
+                    <div className="bio-entry"><span id="name">{user.name}</span></div>
                     <div className="bio-entry">
                         <Editable
                             options={schoolEditableOptions}
-                            onChange={school => model.save({ school }, saveOptions)}>
-                            {school}
+                            onChange={school => this.props.save({ school })}>
+                            {user.school}
                         </Editable>
                     </div>
                     <div className="bio-entry">
                         <Editable
                             options={emailEditableOptions}
-                            onChange={email => model.save({ email }, saveOptions)}
+                            onChange={email => this.props.save({ email })}
                         />
                     </div>
                     <div className="bio-entry">
                         <Editable
                             options={mentorEditableOptions}
-                            onChange={primary_mentor => model.save({ primary_mentor }, saveOptions)}
+                            onChange={primary_mentor => this.props.save({ primary_mentor })}
                         />
                     </div>
                 </div>
@@ -395,7 +352,7 @@ class UserBioInt extends React.Component {
                             <dd>
                                 <Editable
                                     options={groupsEditableOptions}
-                                    onChange={userGroups => model.save({ groups: new Set(userGroups.split(',')) }, saveOptions)}
+                                    onChange={groups => this.props.save({ groups: groups.split(',') })}
                                 />
                             </dd>
 
@@ -403,15 +360,15 @@ class UserBioInt extends React.Component {
                             <dd>
                                 <Editable
                                     options={rbUsernameEditableOptions}
-                                    onChange={rb_username => model.save({ rb_username }, saveOptions)}
+                                    onChange={rb_username => this.props.save({ rb_username })}
                                 />
                             </dd>
 
                             <dt>Slack username:</dt>
-                            <dd>{slack_username}</dd>
+                            <dd>{user.slack_username}</dd>
 
                             <dt>Timezone:</dt>
-                            <dd>{timezone}</dd>
+                            <dd>{user.timezone}</dd>
                         </dl>
                     </div>
                 )}
@@ -424,6 +381,7 @@ class UserBioInt extends React.Component {
 const UserBio = connect(state => ({
     groups: state.groups,
     manage: state.manage,
+    users: state.users,
 }))(UserBioInt);
 
 
@@ -483,10 +441,9 @@ class Projects extends React.Component {
             return <span className="fas fa-sync fa-spin" />;
         }
 
-        const email = user.get('email');
         const tasks = [].concat(...(
             Object.values(projects).map(section => section.tasks)))
-            .filter(task => task.assignee === email);
+            .filter(task => task.assignee === user.email);
 
         return (
             <ul className="link-list">
@@ -598,6 +555,7 @@ class UserDetail extends React.Component {
     constructor(props) {
         super(props);
 
+        this.save = this.save.bind(this);
         this.update = this.update.bind(this);
 
         this.events = [];
@@ -606,45 +564,39 @@ class UserDetail extends React.Component {
             events: [],
             statusReports: null,
             reviewRequests: null,
-            userModel: null,
         };
     }
 
+    save(attrs) {
+        this.props.onSave(Object.assign({}, this.props.user, attrs));
+    }
+
     componentDidMount() {
-        window.application.on('ready', this.update);
         this.update();
     }
 
-    componentWillUnmount() {
-        window.application.off('ready', this.update);
-    }
-
     componentDidUpdate(prevProps) {
-        if (prevProps.match.params.userId !== this.props.match.params.userId) {
+        if (prevProps.user !== this.props.user) {
             this.update();
         }
     }
 
     update() {
-        const userModel = window.application.get('users')
-            .findWhere({ slack_username: this.props.match.params.userId });
+        this.setState({
+            codeReviews: null,
+            events: [],
+            reviewRequests: null,
+        });
 
-        if (userModel) {
-            this.setState({
-                codeReviews: null,
-                events: [],
-                reviewRequests: null,
-                userModel: userModel,
-            });
-
+        if (this.props.user) {
             this.events = [];
-            this.updateCodeReviews(userModel);
-            this.updateReviewRequests(userModel);
+            this.updateCodeReviews();
+            this.updateReviewRequests();
         }
     }
 
-    updateCodeReviews(userModel) {
-        fetch(`/api/reviews/${userModel.get('rb_username')}`)
+    updateCodeReviews() {
+        fetch(`/api/reviews/${this.props.user.rb_username}`)
             .then(result => result.json())
             .then(result => {
                 const events = Array.from(this.events);
@@ -676,8 +628,8 @@ class UserDetail extends React.Component {
             });
     }
 
-    updateReviewRequests(userModel) {
-        fetch(`/api/review-requests/${userModel.get('rb_username')}`)
+    updateReviewRequests() {
+        fetch(`/api/review-requests/${this.props.user.rb_username}`)
             .then(result => result.json())
             .then(result => {
                 const reviewRequests = [];
@@ -731,17 +683,11 @@ class UserDetail extends React.Component {
         const {
             codeReviews,
             reviewRequests,
-            userModel,
         } = this.state;
 
-        if (userModel === null || !user) {
+        if (!user) {
             return <span className="fas fa-sync fa-spin" />;
         }
-
-        const {
-            projects: legacyProjects,
-            status_reports: legacyStatusReports,
-        } = userModel.attributes;
 
         const statusReportsItems = statusReports === null
             ? <span className="fas fa-sync fa-spin" />
@@ -792,7 +738,7 @@ class UserDetail extends React.Component {
             mode: 'inline',
             showbuttons: 'bottom',
             type: 'textarea',
-            value: userModel.get('notes'),
+            value: user.notes,
             unsavedclass: null,
         };
 
@@ -801,30 +747,30 @@ class UserDetail extends React.Component {
                 <Helmet>
                     <title>{user.name} - Student Sonar</title>
                 </Helmet>
-                <UserBio model={userModel} />
+                <UserBio user={user} save={this.save} />
                 <SummaryEntry title="Projects">
-                    {(legacyProjects && legacyProjects.length) ? (
-                        <ModelLinksWrapper
-                            model={userModel}
-                            property="projects"
+                    {(user.projects && user.projects.length) ? (
+                        <Links
+                            items={user.projects}
+                            onChange={links => this.save({ projects: links })}
                             manage={manage}
                         />
                     ) : (
-                        <Projects user={userModel} />
+                        <Projects user={user} />
                     )}
                 </SummaryEntry>
                 <SummaryEntry title="Demo Videos">
-                    <ModelLinksWrapper
-                        model={userModel}
-                        property="demos"
+                    <Links
+                        items={user.demos}
+                        onChange={links => this.save({ demos: links })}
                         manage={manage}
                     />
                 </SummaryEntry>
                 <SummaryEntry title="Status Reports">
-                    {(legacyStatusReports && legacyStatusReports.length) ? (
-                        <ModelLinksWrapper
-                            model={userModel}
-                            property="status_reports"
+                    {(user.status_reports && user.status_reports.length) ? (
+                        <Links
+                            items={user.status_reports}
+                            onChange={links => this.save({ status_reports: links })}
                             manage={manage}
                         />
                     ) : (
@@ -840,7 +786,7 @@ class UserDetail extends React.Component {
                     <Editable
                         ref={el => this.notesEl = el}
                         options={notesEditableOptions}
-                        onChange={notes => userModel.save({ notes }, { wait: true })}
+                        onChange={notes => this.save({ notes })}
                     />
                 </SummaryEntry>
                 <SummaryEntry title="Review Requests">
@@ -925,4 +871,7 @@ const mapStateToProps = (state, props) => {
         user,
     };
 };
-export default connect(mapStateToProps)(UserDetail);
+const mapDispatchToProps = (dispatch, props) => ({
+    onSave: item => dispatch(saveUser(item)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(UserDetail);

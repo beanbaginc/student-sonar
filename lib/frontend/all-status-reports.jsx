@@ -172,9 +172,9 @@ class AllStatusReports extends React.Component {
         const {
             groups,
             manage,
-            model,
             statusReports,
             statusReportDueDates,
+            users,
         } = this.props;
 
         const activeGroupIds = new Set(
@@ -182,33 +182,28 @@ class AllStatusReports extends React.Component {
                 .filter(group => group.show)
                 .map(group => group.group_id));
 
-        const allUsers = model.get('users');
-
         const dueDates = statusReportDueDates.items
             .filter(dueDate => {
                 const showTo = new Set(dueDate.show_to_groups);
                 return (showTo.size === 0 || intersectionExists(showTo, activeGroupIds));
             })
             .map(dueDate => {
-                const dueDateId = dueDate._id;
                 const showTo = new Set(dueDate.show_to_groups);
 
-                const users = allUsers
-                    .chain()
-                    .filter(user => intersectionExists(showTo, user.get('groups')))
+                const dueDateUsers = users.items
+                    .filter(user => intersectionExists(showTo, new Set(user.groups)))
                     .map(user => {
                         const report = _.findWhere(statusReports.items, {
-                            date_due: dueDateId,
-                            user: user.get('id'),
+                            date_due: dueDate._id,
+                            user: user._id,
                         });
 
                         return {
-                            avatar: user.get('avatar'),
-                            name: user.get('name'),
+                            avatar: user.avatar,
+                            name: user.name,
                             report: report && report._id,
                         };
-                    })
-                    .value();
+                    });
 
                 return (
                     <RowView
@@ -216,7 +211,7 @@ class AllStatusReports extends React.Component {
                         item={dueDate}
                         groups={groups}
                         manage={manage}
-                        users={users}
+                        users={dueDateUsers}
                         onSave={this.props.onSave}
                         onDelete={this.props.onDelete}
                     />
@@ -269,6 +264,7 @@ const mapStateToProps = state => ({
     manage: state.manage,
     statusReports: state.statusReports,
     statusReportDueDates: state.statusReportDueDates,
+    users: state.users,
 });
 const mapDispatchToProps = (dispatch, props) => ({
     onDelete: id => dispatch(deleteStatusReportDueDate(id)),

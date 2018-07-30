@@ -61,7 +61,6 @@ class EditStatusReport extends React.Component {
 
     constructor(props) {
         super(props);
-        this.onModelReady = this.onModelReady.bind(this);
         this.onEditorChanged = this.onEditorChanged.bind(this);
 
         this.state = {
@@ -69,18 +68,6 @@ class EditStatusReport extends React.Component {
             preview: false,
             unsaved: false,
         };
-    }
-
-    componentDidMount() {
-        this.props.model.on('ready', this.onModelReady);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.onModelReady);
-    }
-
-    onModelReady() {
-        this.forceUpdate();
     }
 
     onEditorChanged(value) {
@@ -93,7 +80,6 @@ class EditStatusReport extends React.Component {
     render() {
         const {
             dueDate,
-            model,
             match,
             statusReport,
         } = this.props;
