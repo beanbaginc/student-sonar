@@ -5,9 +5,8 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import _ from 'underscore';
 
-import Confirm from './confirm';
+import confirm from './confirm';
 import Editable from './editable';
 import {
     deleteStatusReportDueDate,
@@ -27,15 +26,14 @@ class RowView extends React.Component {
         e.preventDefault();
         e.stopPropagation();
 
-        const confirmDlg = new Confirm(
+        confirm(
             'Delete status report due date?',
             'This action cannot be undone. If there are submitted status reports for this, those will be orphaned.',
             {
-                accept_button_text: 'Delete',
-                accept_button_class: 'btn-danger'
+                acceptButtonText: 'Delete',
+                acceptButtonClass: 'btn-danger',
+                onAccept: () => this.props.onDelete(this.props.item._id),
             });
-
-        confirmDlg.on('accept', () => this.props.onDelete(this.props.item._id));
     }
 
     onSave(newAttrs) {
@@ -193,10 +191,9 @@ class AllStatusReports extends React.Component {
                 const dueDateUsers = users.items
                     .filter(user => intersectionExists(showTo, new Set(user.groups)))
                     .map(user => {
-                        const report = _.findWhere(statusReports.items, {
-                            date_due: dueDate._id,
-                            user: user._id,
-                        });
+                        const report = statusReports.items.find(item =>
+                            item.date_due === dueDate._id &&
+                            item.user === user._id);
 
                         return {
                             avatar: user.avatar,

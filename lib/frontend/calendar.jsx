@@ -5,9 +5,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
-import _ from 'underscore';
 
-import Confirm from './confirm';
+import confirm from './confirm';
 import {
     deleteCalendarItem,
     fetchCalendar,
@@ -106,7 +105,9 @@ class EditCalendarEntryInt extends React.Component {
             })
             .on('change', this.onDateChanged);
 
-        const groups = _.pluck(this.props.groups.items, 'group_id').sort();
+        const groups = this.props.groups.items
+            .map(group => group.group_id)
+            .sort();
 
         this.$groups
             .selectize({
@@ -219,15 +220,14 @@ class CalendarEntry extends React.Component {
     }
 
     onDeleteClicked() {
-        const confirmDlg = new Confirm(
+        confirm(
             'Delete calendar item?',
             'This action cannot be undone',
             {
-                accept_button_text: 'Delete',
-                accept_button_class: 'btn-danger',
+                acceptButtonText: 'Delete',
+                acceptButtonClass: 'btn-danger',
+                onAccept: () => this.props.onDelete(this.props.item._id),
             });
-
-        confirmDlg.on('accept', () => this.props.onDelete(this.props.item._id));
     }
 
     render() {

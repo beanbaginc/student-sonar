@@ -71,7 +71,7 @@ class LinkEditable extends $.fn.editabletypes.abstractinput {
     }
 
     value2str(value) {
-        return _.values(value).join(':');
+        return Object.values(value).join(':');
     }
 
     str2value(str) {
@@ -303,7 +303,7 @@ class UserBioInt extends React.Component {
             },
             unsavedclass: null,
             display: function(value) {
-                if (_.isFunction(value)) {
+                if (typeof value === 'function') {
                     value = value();
                 }
 
