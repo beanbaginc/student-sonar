@@ -1,39 +1,41 @@
-#!/usr/bin/env ./node_modules/.bin/babel-node --presets env --plugins dedent
-
-import Q from 'q';
+#!/usr/bin/env ./node_modules/.bin/babel-node --presets env
 
 import init from '../lib/init';
 import schema from '../lib/schema';
 import Slack from '../lib/slack';
 
 function updateUser(user) {
-    const deferred = Q.defer();
+    return new Promise((resolve, reject) => {
+        if (user.is_bot) {
+            resolve();
+        } else {
+            console.log('Saving data for %s (%s - %s)',
+                        user.profile.real_name_normalized, user.name, user.id);
 
-    if (user.is_bot) {
-        deferred.resolve();
-    } else {
-        console.log('Saving data for %s (%s - %s)',
-	            user.profile.real_name_normalized, user.name, user.id);
-
-        try {
-            let query = schema.User.findOneAndUpdate(
-                { slack_user_id: user.id },
-                {
-                    email: user.profile.email,
-                    slack_user_id: user.id,
-                    slack_username: user.name,
-                    name: user.profile.real_name_normalized,
-                    avatar: user.profile.image_192,
-                    timezone: user.tz
-                },
-                { upsert: true },
-                deferred.makeNodeResolver());
-        } catch(e) {
-            deferred.reject(e);
+            try {
+                let query = schema.User.findOneAndUpdate(
+                    { slack_user_id: user.id },
+                    {
+                        email: user.profile.email,
+                        slack_user_id: user.id,
+                        slack_username: user.name,
+                        name: user.profile.real_name_normalized,
+                        avatar: user.profile.image_192,
+                        timezone: user.tz
+                    },
+                    { upsert: true },
+                    (err, result) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
+                    });
+            } catch(e) {
+                reject(e);
+            }
         }
-    }
-
-    return deferred.promise;
+    });
 }
 
 init()
