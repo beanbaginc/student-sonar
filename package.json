@@ -28,6 +28,7 @@
     "bootstrap-datepicker": "^1.8.0",
     "bootstrap-toggle": "^2.2.2",
     "cal-heatmap": "^3.6.2",
+    "compression-webpack-plugin": "^1.1.11",
     "connect-mongo": "^2.0.1",
     "css-loader": "^1.0.0",
     "del": "^3.0.0",
@@ -69,6 +70,7 @@
     "underscore": "^1.9.1",
     "url-loader": "^1.0.1",
     "webpack": "^4.16.3",
+    "webpack-cli": "^3.1.0",
     "webpack-stream": "^5.0.0",
     "x-editable": "^1.5.1"
   },

@@ -21,6 +21,11 @@ import init from './lib/init';
 init()
     .then(options => {
         const app = express();
+        app.get('*.js', (req, res, next) => {
+            req.url = req.url + '.gz';
+            res.set('Content-Encoding', 'gzip');
+            next();
+        });
         app.use('/scripts', express.static('build/scripts'));
 
         if (production) {
