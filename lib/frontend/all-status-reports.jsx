@@ -9,26 +9,18 @@ import _ from 'underscore';
 
 import Confirm from './confirm';
 import Editable from './editable';
+import {
+    deleteStatusReportDueDate,
+    saveStatusReportDueDate
+} from './redux/modules/status-report-due-dates';
 import {intersectionExists} from './util';
 
 
 class RowView extends React.Component {
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
         this.onDeleteClicked = this.onDeleteClicked.bind(this);
-    }
-
-    componentDidMount() {
-        this.props.model.on('change', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('change', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
+        this.onSave = this.onSave.bind(this);
     }
 
     onDeleteClicked(e) {
@@ -43,13 +35,20 @@ class RowView extends React.Component {
                 accept_button_class: 'btn-danger'
             });
 
-        confirmDlg.on('accept', () => this.props.model.destroy());
+        confirmDlg.on('accept', () => this.props.onDelete(this.props.item._id));
+    }
+
+    onSave(newAttrs) {
+        const attrs = Object.assign({
+            _id: this.props.item ? this.props.item._id : undefined,
+        }, this.props.item, newAttrs);
+
+        this.props.onSave(attrs);
     }
 
     render() {
-        const { model, manage, users } = this.props;
-        const date = model.get('date');
-        const showToGroups = model.get('show_to_groups');
+        const { item, groups, manage, users } = this.props;
+        const showToGroups = item.show_to_groups || [];
         const missing = !!users.find(user => user.report === undefined);
 
         const dateEditableOptions = {
@@ -73,23 +72,28 @@ class RowView extends React.Component {
             selectize: {
                 create: true,
                 delimiter: ',',
-                options: _.pluck(this.props.getGroups(), 'group_id').map(
-                    group => ({ text: group, value: group })),
+                options: groups.items
+                    .map(group => group.group_id)
+                    .sort()
+                    .map(group_id => ({
+                        text: group_id,
+                        value: group_id,
+                    })),
                 plugins: ['remove_button'],
             },
             unsavedclass: null,
-            value: this.props.getGroupsString(),
+            value: showToGroups.join(','),
         };
 
         return (
-            <tr className={date < moment() ? (missing > 0 ? 'danger' : 'success') : null}>
+            <tr className={item.date < moment() ? (missing > 0 ? 'danger' : 'success') : null}>
                 <td className="date-column">
                     <Editable
                         options={dateEditableOptions}
-                        onChange={value => this.props.onDateChanged(value)}
+                        onChange={value => this.onSave({ date: value })}
                         onShow={() => this.$deleteButton.hide()}
                         onHide={() => this.$deleteButton.show()}>
-                        {date.format('YYYY-MM-DD')}
+                        {item.date.format('YYYY-MM-DD')}
                     </Editable>
                     {manage && (
                         <button
@@ -106,8 +110,8 @@ class RowView extends React.Component {
                     <Editable
                         className="tags"
                         options={groupsEditableOptions}
-                        onChange={value => this.props.onGroupsChanged(new Set(value.split(',')))}>
-                        {[...showToGroups].map(group => (
+                        onChange={value => this.onSave({ show_to_groups: value.split(',') })}>
+                        {showToGroups.map(group => (
                             <span key={group} className="label label-default">{group}</span>
                         ))}
                     </Editable>
@@ -150,39 +154,28 @@ class RowView extends React.Component {
 class AllStatusReports extends React.Component {
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
         this.onAddClicked = this.onAddClicked.bind(this);
-
-        this.statusReportDueDates = this.props.model.get('statusReportDueDates');
-    }
-
-    componentDidMount() {
-        this.props.model.on('ready', this.handleChange);
-        this.statusReportDueDates.on('add', this.handleChange);
-        this.statusReportDueDates.on('remove', this.handleChange);
-        this.statusReportDueDates.on('change', this.handleChange);
-    }
-
-    componentWillUnmount() {
-        this.props.model.off('ready', this.handleChange);
-        this.statusReportDueDates.off('add', this.handleChange);
-        this.statusReportDueDates.off('remove', this.handleChange);
-        this.statusReportDueDates.off('change', this.handleChange);
-    }
-
-    handleChange() {
-        this.forceUpdate();
     }
 
     onAddClicked() {
-        this.statusReportDueDates.create({
+        const { groups } = this.props;
+
+        this.props.onSave({
             date: moment(),
-            show_to_groups: new Set(),
+            show_to_groups: groups.items
+                .filter(group => group.show)
+                .map(group => group.group_id),
         });
     }
 
     render() {
-        const { groups, manage, model, statusReports } = this.props;
+        const {
+            groups,
+            manage,
+            model,
+            statusReports,
+            statusReportDueDates,
+        } = this.props;
 
         const activeGroupIds = new Set(
             groups.items
@@ -191,14 +184,14 @@ class AllStatusReports extends React.Component {
 
         const allUsers = model.get('users');
 
-        const dueDates = this.statusReportDueDates
+        const dueDates = statusReportDueDates.items
             .filter(dueDate => {
-                const showTo = dueDate.get('show_to_groups');
+                const showTo = new Set(dueDate.show_to_groups);
                 return (showTo.size === 0 || intersectionExists(showTo, activeGroupIds));
             })
             .map(dueDate => {
-                const dueDateId = dueDate.get('id');
-                const showTo = dueDate.get('show_to_groups');
+                const dueDateId = dueDate._id;
+                const showTo = new Set(dueDate.show_to_groups);
 
                 const users = allUsers
                     .chain()
@@ -219,14 +212,13 @@ class AllStatusReports extends React.Component {
 
                 return (
                     <RowView
-                        key={dueDate.get('id') || dueDate.cid}
-                        model={dueDate}
+                        key={dueDate._id}
+                        item={dueDate}
+                        groups={groups}
                         manage={manage}
                         users={users}
-                        onDateChanged={date => dueDate.save({ date })}
-                        getGroups={() => groups}
-                        getGroupsString={() => dueDate.getGroupsString()}
-                        onGroupsChanged={show_to_groups => dueDate.save({ show_to_groups })}
+                        onSave={this.props.onSave}
+                        onDelete={this.props.onDelete}
                     />
                 );
             });
@@ -276,7 +268,10 @@ const mapStateToProps = state => ({
     groups: state.groups,
     manage: state.manage,
     statusReports: state.statusReports,
+    statusReportDueDates: state.statusReportDueDates,
 });
-
-
-export default connect(mapStateToProps)(AllStatusReports);
+const mapDispatchToProps = (dispatch, props) => ({
+    onDelete: id => dispatch(deleteStatusReportDueDate(id)),
+    onSave: item => dispatch(saveStatusReportDueDate(item)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(AllStatusReports);

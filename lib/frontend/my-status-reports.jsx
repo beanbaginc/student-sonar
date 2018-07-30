@@ -28,7 +28,7 @@ class MyStatusReports extends React.Component {
     }
 
     render() {
-        const { model, myUser, statusReports } = this.props;
+        const { model, myUser, statusReports, statusReportDueDates } = this.props;
 
         if (myUser === null) {
             return null;
@@ -39,14 +39,13 @@ class MyStatusReports extends React.Component {
         const myGroups = new Set(myUser.groups);
         const now = moment();
 
-        const dueDates = model.get('statusReportDueDates')
-            .filter(d => intersectionExists(d.get('show_to_groups'), myGroups))
-            .sort((a, b) => a.get('date').isBefore(b.get('date')) ? -1 : 1)
+        const dueDates = statusReportDueDates.items
+            .filter(d => intersectionExists(new Set(d.show_to_groups), myGroups))
+            .sort((a, b) => a.date.isBefore(b.date) ? -1 : 1)
             .map(dueDate => {
-                const dueDateId = dueDate.get('id');
+                const dueDateId = dueDate._id;
                 const report = myStatusReports.find(d => d.date_due === dueDateId);
-                const date = dueDate.get('date');
-                const daysLeft = date.diff(now, 'days', true);
+                const daysLeft = dueDate.date.diff(now, 'days', true);
 
                 let itemClass = '';
                 let description = '';
@@ -67,7 +66,7 @@ class MyStatusReports extends React.Component {
                         key={dueDateId}
                         to={`/status/edit/${dueDateId}`}
                         className={`list-group-item ${itemClass}`}>
-                        <time>{date.format('ddd, MMM D')}</time>
+                        <time>{dueDate.date.format('ddd, MMM D')}</time>
                         <span>{description}</span>
                     </Link>
                 );
@@ -93,5 +92,6 @@ class MyStatusReports extends React.Component {
 const mapStateToProps = state => ({
     myUser: state.users.myUser,
     statusReports: state.statusReports,
+    statusReportDueDates: state.statusReportDueDates,
 });
 export default connect(mapStateToProps)(MyStatusReports);

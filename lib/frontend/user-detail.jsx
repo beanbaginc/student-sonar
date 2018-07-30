@@ -880,8 +880,7 @@ const mapStateToProps = (state, props) => {
         const now = moment();
         const usersDueDates = statusReportDueDates.items
             .filter(dueDate => intersectionExists(new Set(dueDate.show_to_groups), usersGroups))
-            .sort((a, b) => a.date.localeCompare(b))
-            .reverse();
+            .sort((a, b) => a.date.diff(b.date));
 
         const filteredStatusReports = statusReports.items
             .filter(report => report.user === user._id);
