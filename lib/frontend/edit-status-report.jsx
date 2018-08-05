@@ -9,7 +9,42 @@ import ToggleSwitch from './toggle-switch';
 import { saveStatusReport } from './redux/modules/status-reports';
 
 
-class EditStatusReport extends React.Component {
+@connect(
+    (state, props) => {
+        const {
+            statusReportDueDates,
+            statusReports,
+            users,
+        } = state;
+
+        const dueDate = statusReportDueDates.items.find(
+            dueDate => dueDate._id === props.match.params.dueDateId);
+
+        let statusReport = null;
+
+        if (dueDate && users.myUser) {
+            statusReport = statusReports.items.find(report => (
+                report.date_due === dueDate._id &&
+                report.user === users.myUser._id))
+
+            if (!statusReport) {
+                statusReport = {
+                    date_due: dueDate._id,
+                    user: users.myUser._id,
+                };
+            }
+        }
+
+        return {
+            dueDate,
+            statusReport,
+        }
+    },
+    dispatch => ({
+        onChange: statusReport => dispatch(saveStatusReport(statusReport)),
+    })
+)
+export default class EditStatusReport extends React.Component {
     static defaultContent = dedent`
         This is an example template. Please replace all the bullet-points with your
         own status items.
@@ -138,39 +173,3 @@ class EditStatusReport extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = (state, props) => {
-    const {
-        statusReportDueDates,
-        statusReports,
-        users,
-    } = state;
-
-    const dueDate = statusReportDueDates.items.find(
-        dueDate => dueDate._id === props.match.params.dueDateId);
-
-    let statusReport = null;
-
-    if (dueDate && users.myUser) {
-        statusReport = statusReports.items.find(report => (
-            report.date_due === dueDate._id &&
-            report.user === users.myUser._id))
-
-        if (!statusReport) {
-            statusReport = {
-                date_due: dueDate._id,
-                user: users.myUser._id,
-            };
-        }
-    }
-
-    return {
-        dueDate,
-        statusReport,
-    }
-};
-const mapDispatchToProps = (dispatch, props) => ({
-    onChange: statusReport => dispatch(saveStatusReport(statusReport)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(EditStatusReport);

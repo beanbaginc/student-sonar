@@ -8,7 +8,19 @@ import { fetchProjects } from './redux/modules/projects';
 import Project from './project';
 
 
-class ProjectSingle extends React.Component {
+@connect((state, props) => {
+    const { projects } = state;
+
+    const task = Object.values(projects.items)
+        .map(section => section.tasks.find(task => task.id == props.match.params.taskId))
+        .reduce((accumulator, value) => value || accumulator, null);
+
+    return {
+        isFetching: projects.isFetching,
+        task: task,
+    };
+})
+export default class ProjectSingle extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
         dispatch(fetchProjects());
@@ -35,21 +47,3 @@ class ProjectSingle extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = (state, props) => {
-    const { projects } = state;
-
-    const task = Object.values(projects.items)
-        .map(section => section.tasks.find(task => task.id == props.match.params.taskId))
-        .reduce((accumulator, value) => value || accumulator, null);
-
-
-    return {
-        isFetching: projects.isFetching,
-        task: task,
-    };
-};
-
-
-export default connect(mapStateToProps)(ProjectSingle);

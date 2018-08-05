@@ -32,7 +32,10 @@ class RowView extends React.Component {
 }
 
 
-class AllUsers extends React.Component {
+@connect(state => ({
+    users: state.users,
+}))
+export default class AllUsers extends React.Component {
     render() {
         const { users } = this.props;
 
@@ -61,11 +64,3 @@ class AllUsers extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    users: state.users,
-});
-
-
-export default connect(mapStateToProps)(AllUsers);

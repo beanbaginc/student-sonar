@@ -149,7 +149,20 @@ class RowView extends React.Component {
 }
 
 
-class AllStatusReports extends React.Component {
+@connect(
+    (state) => ({
+        groups: state.groups,
+        manage: state.manage,
+        statusReports: state.statusReports,
+        statusReportDueDates: state.statusReportDueDates,
+        users: state.users,
+    }),
+    (dispatch, props) => ({
+        onDelete: id => dispatch(deleteStatusReportDueDate(id)),
+        onSave: item => dispatch(saveStatusReportDueDate(item)),
+    })
+)
+export default class AllStatusReports extends React.Component {
     constructor(props) {
         super(props);
         this.onAddClicked = this.onAddClicked.bind(this);
@@ -254,17 +267,3 @@ class AllStatusReports extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    groups: state.groups,
-    manage: state.manage,
-    statusReports: state.statusReports,
-    statusReportDueDates: state.statusReportDueDates,
-    users: state.users,
-});
-const mapDispatchToProps = (dispatch, props) => ({
-    onDelete: id => dispatch(deleteStatusReportDueDate(id)),
-    onSave: item => dispatch(saveStatusReportDueDate(item)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(AllStatusReports);

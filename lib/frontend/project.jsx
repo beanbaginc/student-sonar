@@ -5,7 +5,12 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 
-class Project extends React.Component {
+@connect(state => ({
+    loggedIn: state.loggedIn,
+    users: state.users.items,
+    userType: state.userType,
+}))
+export default class Project extends React.Component {
     render() {
         const {
             assignee,
@@ -61,13 +66,3 @@ class Project extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    loggedIn: state.loggedIn,
-    users: state.users.items,
-    userType: state.userType,
-});
-
-
-export default connect(mapStateToProps)(Project);

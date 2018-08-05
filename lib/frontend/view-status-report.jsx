@@ -7,7 +7,31 @@ import { connect } from 'react-redux';
 import showdown from 'showdown';
 
 
-class ViewStatusReport extends React.Component {
+@connect((state, props) => {
+    const {
+        statusReportDueDates,
+        statusReports,
+        users,
+    } = state;
+
+    const report = statusReports.items
+        .find(report => report._id === props.match.params.reportId);
+    let dueDate = null;
+    let user = null;
+
+    if (report) {
+        dueDate = statusReportDueDates.items
+            .find(dueDate => dueDate._id === report.date_due);
+        user = users.items.find(user => user._id === report.user);
+    }
+
+    return {
+        dueDate,
+        report,
+        user,
+    };
+})
+export default class ViewStatusReport extends React.Component {
     render() {
         const {
             dueDate,
@@ -44,30 +68,3 @@ class ViewStatusReport extends React.Component {
         return <div className="view-status-report content-inner">{data}</div>;
     }
 }
-
-
-const mapStateToProps = (state, props) => {
-    const {
-        statusReportDueDates,
-        statusReports,
-        users,
-    } = state;
-
-    const report = statusReports.items
-        .find(report => report._id === props.match.params.reportId);
-    let dueDate = null;
-    let user = null;
-
-    if (report) {
-        dueDate = statusReportDueDates.items
-            .find(dueDate => dueDate._id === report.date_due);
-        user = users.items.find(user => user._id === report.user);
-    }
-
-    return {
-        dueDate,
-        report,
-        user,
-    };
-};
-export default connect(mapStateToProps)(ViewStatusReport);

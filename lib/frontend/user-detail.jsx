@@ -206,7 +206,12 @@ class Links extends React.Component {
 }
 
 
-class UserBioInt extends React.Component {
+@connect(state => ({
+    groups: state.groups,
+    manage: state.manage,
+    users: state.users,
+}))
+class UserBio extends React.Component {
     render() {
         const { groups, manage, users, user } = this.props;
 
@@ -378,13 +383,6 @@ class UserBioInt extends React.Component {
 }
 
 
-const UserBio = connect(state => ({
-    groups: state.groups,
-    manage: state.manage,
-    users: state.users,
-}))(UserBioInt);
-
-
 class Timeline extends React.Component {
     render() {
         const events = _.groupBy(
@@ -428,6 +426,13 @@ class Timeline extends React.Component {
 }
 
 
+@connect(state => {
+    const { projects: { isFetching, items: projects }} = state;
+    return {
+        isFetching,
+        projects,
+    };
+})
 class Projects extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
@@ -461,17 +466,6 @@ class Projects extends React.Component {
         );
     }
 }
-
-
-Projects = connect(state => {
-    const { projects } = state;
-    const { isFetching, items } = projects;
-
-    return {
-        isFetching,
-        projects: items,
-    }
-})(Projects);
 
 
 const SummaryEntry = props => (
@@ -549,7 +543,75 @@ class ChatHistory extends React.Component {
 }
 
 
-class UserDetail extends React.Component {
+@connect(
+    (state, props) => {
+        const {
+            manage,
+            statusReports,
+            statusReportDueDates,
+            users,
+        } = state;
+
+        const slackUsername = props.match.params.userId;
+        const user = users.items.find(user => user.slack_username === slackUsername);
+        const events = [];
+        let usersStatusReports = null;
+
+        if (user) {
+            const usersGroups = new Set(user.groups);
+            const now = moment();
+            const usersDueDates = statusReportDueDates.items
+                .filter(dueDate => intersectionExists(new Set(dueDate.show_to_groups), usersGroups))
+                .sort((a, b) => a.date.diff(b.date));
+
+            const filteredStatusReports = statusReports.items
+                .filter(report => report.user === user._id);
+
+            usersStatusReports = usersDueDates.map(dueDate => {
+                const statusReport = filteredStatusReports.find(
+                    report => report.date_due === dueDate._id);
+                const due = moment(dueDate.date);
+
+                if (statusReport) {
+                    const dateSubmitted = moment(statusReport.date_submitted);
+                    const late = due < dateSubmitted;
+                    const link = `/status/view/${statusReport._id}`;
+
+                    events.push({
+                        date: dateSubmitted,
+                        iconFAClass: 'fa-list-ul',
+                        linkURL: link,
+                        summary: late
+                            ? `Status Report (was due ${due.format('ddd. MMM D')})`
+                            : 'Status Report',
+                    });
+
+                    return {
+                        href: link,
+                        late: late,
+                        text: due.format('D MMM YYYY'),
+                    }
+                } else {
+                    return {
+                        text: due.format('D MMM YYYY'),
+                        missing: due < now,
+                    };
+                }
+            });
+        }
+
+        return {
+            events,
+            manage,
+            statusReports: usersStatusReports,
+            user,
+        };
+    },
+    dispatch => ({
+        onSave: item => dispatch(saveUser(item)),
+    })
+)
+export default class UserDetail extends React.Component {
     rbLogoURL = '/images/reviewboard-logo.png';
 
     constructor(props) {
@@ -806,72 +868,3 @@ class UserDetail extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = (state, props) => {
-    const {
-        manage,
-        statusReports,
-        statusReportDueDates,
-        users,
-    } = state;
-
-    const slackUsername = props.match.params.userId;
-    const user = users.items.find(user => user.slack_username === slackUsername);
-    const events = [];
-    let usersStatusReports = null;
-
-    if (user) {
-        const usersGroups = new Set(user.groups);
-        const now = moment();
-        const usersDueDates = statusReportDueDates.items
-            .filter(dueDate => intersectionExists(new Set(dueDate.show_to_groups), usersGroups))
-            .sort((a, b) => a.date.diff(b.date));
-
-        const filteredStatusReports = statusReports.items
-            .filter(report => report.user === user._id);
-
-        usersStatusReports = usersDueDates.map(dueDate => {
-            const statusReport = filteredStatusReports.find(
-                report => report.date_due === dueDate._id);
-            const due = moment(dueDate.date);
-
-            if (statusReport) {
-                const dateSubmitted = moment(statusReport.date_submitted);
-                const late = due < dateSubmitted;
-                const link = `/status/view/${statusReport._id}`;
-
-                events.push({
-                    date: dateSubmitted,
-                    iconFAClass: 'fa-list-ul',
-                    linkURL: link,
-                    summary: late
-                        ? `Status Report (was due ${due.format('ddd. MMM D')})`
-                        : 'Status Report',
-                });
-
-                return {
-                    href: link,
-                    late: late,
-                    text: due.format('D MMM YYYY'),
-                }
-            } else {
-                return {
-                    text: due.format('D MMM YYYY'),
-                    missing: due < now,
-                };
-            }
-        });
-    }
-
-    return {
-        events,
-        manage,
-        statusReports: usersStatusReports,
-        user,
-    };
-};
-const mapDispatchToProps = (dispatch, props) => ({
-    onSave: item => dispatch(saveUser(item)),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(UserDetail);

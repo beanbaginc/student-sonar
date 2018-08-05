@@ -80,7 +80,10 @@ class ModalDialog extends React.Component {
 }
 
 
-class EditCalendarEntryInt extends React.Component {
+@connect(state => ({
+    groups: state.groups,
+}))
+class EditCalendarEntry extends React.Component {
     constructor(props) {
         super(props);
         this.onDateChanged = this.onDateChanged.bind(this);
@@ -209,9 +212,6 @@ class EditCalendarEntryInt extends React.Component {
 }
 
 
-const EditCalendarEntry = connect(state => ({ groups: state.groups }))(EditCalendarEntryInt);
-
-
 class CalendarEntry extends React.Component {
     constructor(props) {
         super(props);
@@ -277,7 +277,20 @@ class CalendarEntry extends React.Component {
 }
 
 
-class Calendar extends React.Component {
+@connect(
+    state => ({
+        calendar: state.calendar,
+        manage: state.manage,
+        myUser: state.users.myUser,
+        userType: state.userType,
+    }),
+    dispatch => ({
+        onDelete: id => dispatch(deleteCalendarItem(id)),
+        onSave: item => dispatch(saveCalendarItem(item)),
+        onFetch: () => dispatch(fetchCalendar()),
+    })
+)
+export default class Calendar extends React.Component {
     constructor(props) {
         super(props);
 
@@ -368,17 +381,3 @@ class Calendar extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    calendar: state.calendar,
-    manage: state.manage,
-    myUser: state.users.myUser,
-    userType: state.userType,
-});
-const mapDispatchToProps = (dispatch, props) => ({
-    onDelete: id => dispatch(deleteCalendarItem(id)),
-    onSave: item => dispatch(saveCalendarItem(item)),
-    onFetch: () => dispatch(fetchCalendar()),
-});
-export default connect(mapStateToProps, mapDispatchToProps)(Calendar);

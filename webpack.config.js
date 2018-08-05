@@ -5,7 +5,8 @@ const CompressionPlugin = require("compression-webpack-plugin");
 
 
 module.exports = {
-    mode: 'production',
+    //mode: 'production',
+    mode: 'development',
     entry: path.join(__dirname, 'lib', 'frontend', 'main.js'),
     output: {
         path: path.join(__dirname, 'build', 'scripts'),
@@ -20,7 +21,7 @@ module.exports = {
                 options: {
                     cacheDirectory: 'babel-cache',
                     presets: ['react', 'env'],
-                    plugins: ['transform-class-properties', 'dedent'],
+                    plugins: ['transform-class-properties', 'transform-decorators-legacy', 'dedent'],
                 },
             },
             {

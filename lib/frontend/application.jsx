@@ -40,7 +40,11 @@ const PermissionDenied = props => (
 );
 
 
-class Application extends React.Component {
+@connect(state => ({
+    loggedIn: state.loggedIn,
+    userType: state.userType,
+}))
+export default class Application extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
         dispatch(fetchGroups());
@@ -170,12 +174,3 @@ class Application extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    loggedIn: state.loggedIn,
-    userType: state.userType,
-});
-
-
-export default connect(mapStateToProps)(Application);

@@ -35,7 +35,14 @@ const ProjectSection = ({ id, name, tasks }) => (
 );
 
 
-class ProjectList extends React.Component {
+@connect(state => {
+    const { projects: { isFetching, items: projects } } = state;
+    return {
+        isFetching,
+        projects
+    };
+})
+export default class ProjectList extends React.Component {
     componentDidMount() {
         const { dispatch } = this.props;
         dispatch(fetchProjects());
@@ -88,17 +95,3 @@ class ProjectList extends React.Component {
         );
     }
 }
-
-
-function mapStateToProps(state) {
-    const { projects } = state;
-    const { isFetching, items } = projects;
-
-    return {
-        isFetching,
-        projects: items,
-    };
-}
-
-
-export default connect(mapStateToProps)(ProjectList);

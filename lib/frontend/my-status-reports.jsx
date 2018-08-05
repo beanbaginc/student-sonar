@@ -9,7 +9,12 @@ import { Link } from 'react-router-dom';
 import {intersectionExists} from './util';
 
 
-class MyStatusReports extends React.Component {
+@connect(state => ({
+    myUser: state.users.myUser,
+    statusReports: state.statusReports,
+    statusReportDueDates: state.statusReportDueDates,
+}))
+export default class MyStatusReports extends React.Component {
     render() {
         const { myUser, statusReports, statusReportDueDates } = this.props;
 
@@ -70,11 +75,3 @@ class MyStatusReports extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    myUser: state.users.myUser,
-    statusReports: state.statusReports,
-    statusReportDueDates: state.statusReportDueDates,
-});
-export default connect(mapStateToProps)(MyStatusReports);

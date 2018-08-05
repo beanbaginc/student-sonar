@@ -25,7 +25,12 @@ class SidebarItem extends React.Component {
 }
 
 
-class Sidebar extends React.Component {
+@withRouter
+@connect(state => ({
+    groups: state.groups,
+    users: state.users,
+}))
+export default class Sidebar extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -57,7 +62,7 @@ class Sidebar extends React.Component {
                     });
 
                 return (
-                    <li key={group.id}>
+                    <li key={group._id}>
                         <div>{group.name}</div>
                         <ul className="nav nav-sidebar">
                             {groupUsers.map(user => (
@@ -96,11 +101,3 @@ class Sidebar extends React.Component {
         );
     }
 }
-
-
-const mapStateToProps = state => ({
-    groups: state.groups,
-    users: state.users,
-});
-
-export default withRouter(connect(mapStateToProps)(Sidebar));
