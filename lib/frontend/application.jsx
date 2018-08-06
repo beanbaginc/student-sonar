@@ -1,14 +1,12 @@
 // jshint ignore: start
 
+import ApolloClient from 'apollo-boost';
 import React from 'react';
+import { ApolloProvider } from 'react-apollo';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import { fetchGroups } from './redux/modules/groups';
-import { fetchStatusReportDueDates } from './redux/modules/status-report-due-dates';
-import { fetchStatusReports } from './redux/modules/status-reports';
-import { fetchUsers } from './redux/modules/users';
 import AllStatusReports from './all-status-reports';
 import AllUsers from './all-users';
 import Calendar from './calendar';
@@ -50,12 +48,15 @@ class PermissionDenied extends React.Component {
     isMentor: state.userType === 'mentor',
 }))
 export default class Application extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch(fetchGroups());
-        dispatch(fetchStatusReportDueDates());
-        dispatch(fetchStatusReports());
-        dispatch(fetchUsers());
+    constructor(props) {
+        super(props);
+
+        this.client = new ApolloClient({
+            uri: '/api/graphql',
+            fetchOptions: {
+                credentials: 'include',
+            },
+        });
     }
 
     render() {
@@ -63,7 +64,7 @@ export default class Application extends React.Component {
 
         return (
             <BrowserRouter>
-                <React.Fragment>
+                <ApolloProvider client={this.client}>
                     <Helmet>
                         <title>Student Sonar</title>
                     </Helmet>
@@ -159,7 +160,7 @@ export default class Application extends React.Component {
                             )}
                         />
                     </div>
-                </React.Fragment>
+                </ApolloProvider>
             </BrowserRouter>
         );
     }

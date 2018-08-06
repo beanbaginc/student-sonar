@@ -2,40 +2,49 @@
 
 import moment from 'moment';
 import React from 'react';
+import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { MY_STATUS_REPORTS_QUERY } from './api/user';
 import {intersectionExists} from './util';
 
 
-@connect(state => ({
-    myUser: state.users.myUser,
-    statusReports: state.statusReports,
-    statusReportDueDates: state.statusReportDueDates,
-}))
+@graphql(MY_STATUS_REPORTS_QUERY, {
+    options: {
+        variables: {
+            id: window.userId,
+        },
+    },
+})
 export default class MyStatusReports extends React.Component {
     render() {
-        const { myUser, statusReports, statusReportDueDates } = this.props;
+        const { data: { loading, error, user } } = this.props;
 
-        if (myUser === null) {
-            return null;
-        }
+        let content;
 
-        const myStatusReports = statusReports.items.filter(
-            report => report.user === myUser._id);
-        const myGroups = new Set(myUser.groups);
-        const now = moment();
+        if (loading) {
+            content = (
+                <div className="list-group-item">
+                    <span className="fas fa-sync fa-spin"></span>
+                </div>
+            );
+        } else if (error) {
+            content = (
+                <div className="list-group-item">
+                    <span className="fas fa-exclamation-triangle"></span>
+                    {error}
+                </div>
+            );
+        } else {
+            const now = moment();
 
-        const dueDates = statusReportDueDates.items
-            .filter(d => intersectionExists(new Set(d.show_to_groups), myGroups))
-            .sort((a, b) => a.date.isBefore(b.date) ? -1 : 1)
-            .map(dueDate => {
-                const dueDateId = dueDate._id;
-                const report = myStatusReports.find(d => d.date_due === dueDateId);
-                const daysLeft = dueDate.date.diff(now, 'days', true);
+            content = user.status_report_due_dates.map(dueDate => {
+                const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
+                const date = moment(dueDate.date);
+                const daysLeft = date.diff(now, 'days', true);
 
-                let itemClass = '';
+                let itemClass = ''
                 let description = '';
 
                 if (report) {
@@ -51,14 +60,15 @@ export default class MyStatusReports extends React.Component {
 
                 return (
                     <Link
-                        key={dueDateId}
-                        to={`/status/edit/${dueDateId}`}
+                        key={dueDate.id}
+                        to={`/status/edit/${dueDate.id}`}
                         className={`list-group-item ${itemClass}`}>
-                        <time>{dueDate.date.format('ddd, MMM D')}</time>
+                        <time>{date.format('ddd, MMM D')}</time>
                         <span>{description}</span>
                     </Link>
-                );
+                )
             });
+        }
 
         return (
             <div className="my-status-reports content-inner">
@@ -68,7 +78,7 @@ export default class MyStatusReports extends React.Component {
                 <div className="panel panel-default">
                     <div className="panel-heading">My Status Reports</div>
                     <div className="list-group">
-                        {dueDates}
+                        {content}
                     </div>
                 </div>
             </div>

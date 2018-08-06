@@ -1,0 +1,133 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+
+type Query {
+    calendar: Calendar
+    groups(active: Boolean = false): [Group!]!
+    project(id: ID!): Project
+    projects: [Project!]!
+    status_report(date_due: ID, id: ID, user: ID): StatusReport
+    status_report_due_dates(active: Boolean = false): [StatusReportDueDate!]!
+    user(id: ID = null, slack_username: String = null): User
+    users(active: Boolean = false, is_mentor: Boolean = null): [User!]!
+}
+
+
+type Mutation {
+    saveStatusReport(
+        date_due: ID!
+        id: ID
+        text: String!
+        user: ID!
+    ): StatusReport
+
+    deleteStatusReportDueDate(
+        id: ID!
+    ): ID!
+
+    saveStatusReportDueDate(
+        id: ID,
+        date: String!,
+        show_to_groups: [String!]!
+    ): StatusReportDueDate
+
+    saveUser(
+        demos: [LinkInput!]!,
+        email: String,
+        groups: [String!]!
+        id: ID!
+        notes: String,
+        primary_mentor: ID
+        rb_username: String,
+        school: String,
+    ): User
+}
+
+
+type Calendar {
+    items: [CalendarItem!]!
+    subscribe_url: String
+}
+
+
+type CalendarItem {
+    all_day: Boolean
+    end: String!
+    id: ID!
+    start: String!
+    title: String!
+}
+
+
+type Group {
+    group_id: String!
+    id: ID!
+    name: String!
+    show: Boolean!
+    users: [User!]!
+}
+
+
+type Link {
+    color: String
+    href: String
+    text: String
+}
+
+
+input LinkInput {
+    color: String
+    href: String
+    text: String
+}
+
+
+type Project {
+    completed: Boolean
+    html: String!
+    href: String
+    id: ID!
+    name: String!
+    section: String!
+    tags: [String!]!
+    user: User
+}
+
+
+type StatusReport {
+    date_due: StatusReportDueDate!
+    date_submitted: String
+    href: String
+    id: ID
+    text: String
+    user: User
+}
+
+
+type StatusReportDueDate {
+    date: String!
+    id: ID!
+    show_to_groups: [String!]!
+}
+
+
+type User {
+    avatar: String
+    demos: [Link!]!
+    email: String
+    groups: [String!]!
+    id: ID!
+    name: String
+    notes: String
+    primary_mentor: ID
+    projects: [Project!]
+    rb_username: String
+    school: String
+    slack_username: String
+    status_report_due_dates: [StatusReportDueDate!]!
+    status_reports: [StatusReport!]!
+    timezone: String
+}

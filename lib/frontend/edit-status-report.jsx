@@ -2,98 +2,75 @@
 
 import moment from 'moment';
 import React from 'react';
+import { compose, graphql } from 'react-apollo';
 import ReactMDE from 'react-mde';
-import { connect } from 'react-redux';
 
+import { EDIT_STATUS_REPORT_QUERY, saveStatusReport } from './api/status-report';
 import ToggleSwitch from './toggle-switch';
-import { saveStatusReport } from './redux/modules/status-reports';
 
 
-@connect(
-    (state, props) => {
-        const {
-            statusReportDueDates,
-            statusReports,
-            users,
-        } = state;
+const defaultContent = dedent`
+    This is an example template. Please replace all the bullet-points with your
+    own status items.
 
-        const dueDate = statusReportDueDates.items.find(
-            dueDate => dueDate._id === props.match.params.dueDateId);
+    ### What project are you working on?
 
-        let statusReport = null;
+    * This will help us and future readers know what your status report is all
+      about.
 
-        if (dueDate && users.myUser) {
-            statusReport = statusReports.items.find(report => (
-                report.date_due === dueDate._id &&
-                report.user === users.myUser._id))
 
-            if (!statusReport) {
-                statusReport = {
-                    date_due: dueDate._id,
-                    user: users.myUser._id,
-                };
-            }
-        }
+    ### This week I accomplished:
 
-        return {
-            dueDate,
-            statusReport,
-        }
-    },
-    dispatch => ({
-        onChange: statusReport => dispatch(saveStatusReport(statusReport)),
-    })
+    Please include links to review requests, notes, etc.
+
+    * Code you've written
+    * Mockups you've made
+    * Investigation into the code.
+    * E-mails you sent out to mailing lists
+    * Reviews you've done of other students' code
+    * Anything else related to the project that you've done.
+
+
+    ### This week I learned:
+
+    * Learned about some part of the Review Board codebase? Some new language
+      feature? Some feature of the web? Tell us about it!
+
+
+    ### What I plan to do next week:
+
+    * Your tasks and time estimates. Be specific. A good skill to develop is to be
+      able to make detailed plans and stick with them.
+
+
+    ### What, if anything, is blocking you from making progress?
+
+    * Any errors you're hitting. (Please post any to Pastie.org and link them
+      here.)
+    * Design problems.
+    * Confusion about the codebase or your project.
+    * Anything else.
+
+
+    ### Any other questions
+
+    * Ask us anything and everything. We'll go through these questions during the
+      team meeting.
+    `;
+
+
+@compose(
+    graphql(EDIT_STATUS_REPORT_QUERY, {
+        options: props => ({
+            variables: {
+                date_due: props.match.params.dueDateId,
+                user: window.userId,
+            },
+        }),
+    }),
+    saveStatusReport
 )
 export default class EditStatusReport extends React.Component {
-    static defaultContent = dedent`
-        This is an example template. Please replace all the bullet-points with your
-        own status items.
-
-        ### What project are you working on?
-
-        * This will help us and future readers know what your status report is all
-          about.
-
-
-        ### This week I accomplished:
-
-        Please include links to review requests, notes, etc.
-
-        * Code you've written
-        * Mockups you've made
-        * Investigation into the code.
-        * E-mails you sent out to mailing lists
-        * Reviews you've done of other students' code
-        * Anything else related to the project that you've done.
-
-
-        ### This week I learned:
-
-        * Learned about some part of the Review Board codebase? Some new language
-          feature? Some feature of the web? Tell us about it!
-
-
-        ### What I plan to do next week:
-
-        * Your tasks and time estimates. Be specific. A good skill to develop is to be
-          able to make detailed plans and stick with them.
-
-
-        ### What, if anything, is blocking you from making progress?
-
-        * Any errors you're hitting. (Please post any to Pastie.org and link them
-          here.)
-        * Design problems.
-        * Confusion about the codebase or your project.
-        * Anything else.
-
-
-        ### Any other questions
-
-        * Ask us anything and everything. We'll go through these questions during the
-          team meeting.
-        `;
-
     constructor(props) {
         super(props);
         this.onEditorChanged = this.onEditorChanged.bind(this);
@@ -114,37 +91,55 @@ export default class EditStatusReport extends React.Component {
 
     render() {
         const {
-            dueDate,
-            match,
-            statusReport,
+            data: {
+                loading,
+                error,
+                status_report,
+            },
         } = this.props;
 
-        if (!statusReport) {
-            return <div className="status-report-editor content-inner" />;
+        if (loading) {
+            return (
+                <div className="spinner">
+                    <span className="fas fa-sync fa-spin" />
+                </div>
+            );
+        } else if (error) {
+            return (
+                <div>
+                    <span className="fas fa-exclamation-triangle" />
+                    {error}
+                </div>
+            );
         }
 
-        const mde_visibility = {
+        const mdeVisibility = {
             textarea: !this.state.preview,
             preview: this.state.preview,
             previewHelp: false,
         };
 
-        const mde_value = this.state.value || {
-            text: statusReport.text || EditStatusReport.defaultContent,
+        const mdeValue = this.state.value || {
+            text: status_report.text || defaultContent,
             selection: null,
         };
 
         const onSaveClicked = () => {
-            statusReport.text = this.state.value.text;
-            this.props.onChange(statusReport);
-            this.setState({ unsaved: false });
+            this.props.mutate({
+                variables: {
+                    date_due: status_report.date_due.id,
+                    id: status_report.id,
+                    user: window.userId,
+                    text: this.state.value.text,
+                },
+            });
         };
 
         return (
             <div className="status-report-editor">
                 <div className={`panel panel-default ${this.state.preview ? 'preview' : ''}`}>
                     <div className="panel-heading">
-                        <span>Status report for {moment(dueDate.date).format('ddd, MMM D')}</span>
+                        <span>Status report for {moment(status_report.date_due.date).format('ddd, MMM D')}</span>
 
                         <span className="text-warning">
                             {this.state.unsaved && 'There are unsaved changes'}
@@ -163,9 +158,9 @@ export default class EditStatusReport extends React.Component {
                     </div>
                     <div className="editor-container">
                         <ReactMDE
-                            value={mde_value}
+                            value={mdeValue}
                             onChange={this.onEditorChanged}
-                            visibility={mde_visibility}
+                            visibility={mdeVisibility}
                         />
                     </div>
                 </div>

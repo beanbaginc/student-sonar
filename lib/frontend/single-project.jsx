@@ -1,49 +1,39 @@
 // jshint ignore: start
 
 import React from 'react';
+import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
 
-import { fetchProjects } from './redux/modules/projects';
+import { PROJECT_QUERY } from './api/project';
 import Project from './project';
 
 
-@connect((state, props) => {
-    const { projects } = state;
-
-    const task = Object.values(projects.items)
-        .map(section => section.tasks.find(task => task.id == props.match.params.taskId))
-        .reduce((accumulator, value) => value || accumulator, null);
-
-    return {
-        isFetching: projects.isFetching,
-        task: task,
-    };
+@graphql(PROJECT_QUERY, {
+    options: props => ({
+        variables: {
+            project: props.match.params.taskId,
+        },
+    }),
 })
 export default class ProjectSingle extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch(fetchProjects());
-    }
-
     render() {
-        const { isFetching, task } = this.props;
+        const { data: { loading, error, project }} = this.props;
 
-        if (isFetching) {
+        if (loading) {
             return (
                 <div className="spinner">
                     <span className="fas fa-sync fa-spin"></span>
                 </div>
             );
+        } else {
+            return (
+                <div id="ideas" className="content-inner">
+                    <Helmet>
+                        <title>{project.name} - Student Sonar</title>
+                    </Helmet>
+                    <Project {...project}>{project.html}</Project>
+                </div>
+            );
         }
-
-        return task && (
-            <div id="ideas" className="content-inner">
-                <Helmet>
-                    <title>{task.name} - Student Sonar</title>
-                </Helmet>
-                <Project {...task}>{task.html}</Project>
-            </div>
-        );
     }
 }

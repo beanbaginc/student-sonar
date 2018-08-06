@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 
 @connect(state => ({
     loggedIn: state.loggedIn,
-    users: state.users.items,
     userType: state.userType,
 }))
 export default class Project extends React.Component {
@@ -18,14 +17,10 @@ export default class Project extends React.Component {
             id,
             loggedIn,
             name,
-            projects,
             tags,
-            users,
+            user,
             userType,
         } = this.props;
-        const user = (loggedIn && assignee)
-            ? users.find(user => user.email === assignee)
-            : null;
         const userAvatar = user && user.avatar;
 
         // If an avatar exists. include it.
@@ -43,10 +38,6 @@ export default class Project extends React.Component {
             );
         }
 
-        const projectItems = projects
-            .filter(project => project !== 'Student Projects')
-            .map(project => <span key={project} className="label label-primary">{project}</span>);
-
         const tagItems = tags
             .map(tag => <span key={tag} className="label label-default">{tag}</span>);
 
@@ -55,12 +46,7 @@ export default class Project extends React.Component {
         return (
             <section id={`task-${id}`} className="student-project">
                 <h3>{name}{avatar}</h3>
-                {(tagItems || projectItems) && (
-                    <div className="tags">
-                        {projectItems}
-                        {tagItems}
-                    </div>
-                )}
+                {tagItems && <div className="tags">{tagItems}</div>}
                 <div dangerouslySetInnerHTML={content} />
             </section>
         );

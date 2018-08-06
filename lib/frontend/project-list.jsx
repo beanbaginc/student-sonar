@@ -1,17 +1,17 @@
 // jshint ignore: start
 
 import React from 'react';
+import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
 
-import { fetchProjects } from './redux/modules/projects';
+import { PROJECTS_QUERY } from './api/project';
 import Project from './project';
 import ScrollSpy from './scrollspy';
 
 
-const NavSection = ({ id, name, tasks, onClick }) => (
-    <li className="item" key={id}>
-        <a href={`#section-${id}`} onClick={onClick}>{name}</a>
+const NavSection = ({ id, name, tasks }) => (
+    <li className="item">
+        <a href={`#section-${id}`}>{name}</a>
         <ul className="nav">
             {tasks.map(task => (
                 <li className="sub-item" key={task.id}>
@@ -24,7 +24,7 @@ const NavSection = ({ id, name, tasks, onClick }) => (
 
 
 const ProjectSection = ({ id, name, tasks }) => (
-    <section id={`section-${id}`} key={id}>
+    <section id={`section-${id}`}>
         <div className="page-header">
             <h2>{name}</h2>
         </div>
@@ -35,21 +35,12 @@ const ProjectSection = ({ id, name, tasks }) => (
 );
 
 
-@connect(state => {
-    const { projects: { isFetching, items: projects } } = state;
-    return {
-        isFetching,
-        projects
-    };
-})
+@graphql(PROJECTS_QUERY)
 export default class ProjectList extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch(fetchProjects());
-    }
-
     render() {
-        if (this.props.isFetching) {
+        const { data: { loading, error, projects }} = this.props;
+
+        if (loading) {
             return (
                 <div className="spinner">
                     <span className="fas fa-sync fa-spin"></span>
@@ -57,15 +48,20 @@ export default class ProjectList extends React.Component {
             );
         }
 
-        const sections = Object.entries(this.props.projects).map(item => {
-            const [name, section] = item;
+        const sections = new Map();
+        projects.forEach(project => {
+            if (project.completed) {
+                return;
+            }
 
-            return {
-                id: section.id,
-                name,
-                tasks: section.tasks.filter(task => task.completed === false),
-            };
+            if (sections.has(project.section)) {
+                sections.get(project.section).push(project);
+            } else {
+                sections.set(project.section, [project]);
+            }
         });
+
+        const entries = Array.from(sections.entries());
 
         return (
             <React.Fragment>
@@ -78,15 +74,15 @@ export default class ProjectList extends React.Component {
                     nav="#ideas-nav">
                     <div className="content-inner" id="ideas-container">
                         <div id="ideas">
-                            {sections.map(section =>
-                                <ProjectSection key={section.id} {...section} />
+                            {entries.map(([section, tasks]) =>
+                                <ProjectSection key={section} name={section} tasks={tasks} />
                             )}
                         </div>
                     </div>
                     <nav id="ideas-nav-container">
                         <ul className="nav" id="ideas-nav">
-                            {sections.map(section =>
-                                <NavSection key={section.id} {...section} />
+                            {entries.map(([section, tasks]) =>
+                                <NavSection key={section} name={section} tasks={tasks} />
                             )}
                         </ul>
                     </nav>

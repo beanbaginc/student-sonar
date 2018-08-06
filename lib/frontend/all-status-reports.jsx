@@ -2,19 +2,60 @@
 
 import moment from 'moment';
 import React from 'react';
+import { compose, graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { ALL_GROUPS_QUERY } from './api/group';
+import {
+    STATUS_REPORT_DUE_DATES_QUERY,
+    deleteStatusReportDueDate,
+    saveStatusReportDueDate,
+} from './api/status-report-due-date';
+import { ACTIVE_STATUS_REPORTS_QUERY } from './api/user';
 import confirm from './confirm';
 import Editable from './editable';
-import {
-    deleteStatusReportDueDate,
-    saveStatusReportDueDate
-} from './redux/modules/status-report-due-dates';
 import {intersectionExists} from './util';
 
 
+@deleteStatusReportDueDate
+class DeleteButton extends React.Component {
+    constructor(props) {
+        super(props);
+        this.onDeleteClicked = this.onDeleteClicked.bind(this);
+    }
+
+    onDeleteClicked(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.props.mutate({
+            variables: {
+                id: this.props.item.id,
+            },
+        });
+    }
+
+    render() {
+        return (
+            <button
+                type="button"
+                id="delete-button"
+                className="btn btn-default btn-xs"
+                onClick={this.onDeleteClicked}
+            >
+                <span className="fas fa-trash-alt"></span>
+            </button>
+        );
+    }
+}
+
+
+@compose(
+    graphql(ALL_GROUPS_QUERY),
+    saveStatusReportDueDate
+)
 class RowView extends React.Component {
     constructor(props) {
         super(props);
@@ -37,17 +78,25 @@ class RowView extends React.Component {
     }
 
     onSave(newAttrs) {
-        const attrs = Object.assign({
-            _id: this.props.item ? this.props.item._id : undefined,
-        }, this.props.item, newAttrs);
+        const { item } = this.props;
 
-        this.props.onSave(attrs);
+        this.props.mutate({
+            variables: Object.assign({
+                id: item.id,
+                date: item.date.toISOString(),
+                show_to_groups: item.show_to_groups,
+            }, newAttrs),
+        });
     }
 
     render() {
-        const { item, groups, manage, users } = this.props;
+        const { item, manage, users, data: { groups, loading } } = this.props;
         const showToGroups = item.show_to_groups || [];
         const missing = !!users.find(user => user.report === undefined);
+
+        if (loading) {
+            return null;
+        }
 
         const dateEditableOptions = {
             disabled: !manage,
@@ -70,7 +119,7 @@ class RowView extends React.Component {
             selectize: {
                 create: true,
                 delimiter: ',',
-                options: groups.items
+                options: groups
                     .map(group => group.group_id)
                     .sort()
                     .map(group_id => ({
@@ -94,14 +143,10 @@ class RowView extends React.Component {
                         {item.date.format('YYYY-MM-DD')}
                     </Editable>
                     {manage && (
-                        <button
-                            type="button"
-                            id="delete-button"
-                            className="btn btn-default btn-xs"
-                            onClick={this.onDeleteClicked}
-                            ref={el => this.$deleteButton = el ? $(el) : $()}>
-                            <span className="fas fa-trash-alt"></span>
-                        </button>
+                        <DeleteButton
+                            item={item}
+                            ref={el => this.$deleteButton = el ? $(el) : $()}
+                        />
                     )}
                 </td>
                 <td>
@@ -149,84 +194,106 @@ class RowView extends React.Component {
 }
 
 
-@connect(
-    (state) => ({
-        groups: state.groups,
-        manage: state.manage,
-        statusReports: state.statusReports,
-        statusReportDueDates: state.statusReportDueDates,
-        users: state.users,
-    }),
-    (dispatch, props) => ({
-        onDelete: id => dispatch(deleteStatusReportDueDate(id)),
-        onSave: item => dispatch(saveStatusReportDueDate(item)),
-    })
+@compose(
+    graphql(ALL_GROUPS_QUERY),
+    saveStatusReportDueDate
 )
-export default class AllStatusReports extends React.Component {
+class AddButton extends React.Component {
     constructor(props) {
         super(props);
         this.onAddClicked = this.onAddClicked.bind(this);
     }
 
-    onAddClicked() {
-        const { groups } = this.props;
+    onAddClicked(e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-        this.props.onSave({
-            date: moment(),
-            show_to_groups: groups.items
-                .filter(group => group.show)
-                .map(group => group.group_id),
+        this.props.mutate({
+            variables: {
+                id: null,
+                date: moment().endOf('day').toISOString(),
+                show_to_groups: this.props.data.groups
+                    .filter(group => group.show)
+                    .map(group => group.group_id),
+            },
         });
     }
 
     render() {
+        return (
+            <button
+                type="button"
+                className="btn btn-default"
+                id="add"
+                onClick={this.onAddClicked}
+            >
+                Add new due date
+            </button>
+        );
+    }
+}
+
+
+@compose(
+    graphql(STATUS_REPORT_DUE_DATES_QUERY, { name: 'dueDates' }),
+    graphql(ACTIVE_STATUS_REPORTS_QUERY, { name: 'users' }),
+    connect(state => ({
+        manage: state.manage,
+    }))
+)
+export default class AllStatusReports extends React.Component {
+    render() {
         const {
-            groups,
+            dueDates: {
+                loading: dueDatesLoading,
+                error: dueDatesError,
+                status_report_due_dates,
+            },
             manage,
-            statusReports,
-            statusReportDueDates,
-            users,
+            users: {
+                loading: usersLoading,
+                error: usersError,
+                users,
+            },
         } = this.props;
 
-        const activeGroupIds = new Set(
-            groups.items
-                .filter(group => group.show)
-                .map(group => group.group_id));
+        const loading = dueDatesLoading || usersLoading;
+        const error = dueDatesError || usersError;
 
-        const dueDates = statusReportDueDates.items
-            .filter(dueDate => {
-                const showTo = new Set(dueDate.show_to_groups);
-                return (showTo.size === 0 || intersectionExists(showTo, activeGroupIds));
-            })
-            .map(dueDate => {
-                const showTo = new Set(dueDate.show_to_groups);
+        let content;
 
-                const dueDateUsers = users.items
-                    .filter(user => intersectionExists(showTo, new Set(user.groups)))
+        if (loading) {
+            content = <tr><td colSpan="3"><span className="fas fa-sync fa-spin"></span></td></tr>;
+        } else if (error) {
+            content = <tr><td colSpan="3"><span className="fas fa-exclamation-triangle"></span> {error}</td></tr>;
+        } else {
+            content = status_report_due_dates.map(dueDate => {
+                dueDate = {
+                    date: moment(dueDate.date),
+                    id: dueDate.id,
+                    show_to_groups: dueDate.show_to_groups,
+                };
+
+                const dueDateUsers = users
+                    .filter(user => user.status_report_due_dates.find(d => d.id === dueDate.id))
                     .map(user => {
-                        const report = statusReports.items.find(item =>
-                            item.date_due === dueDate._id &&
-                            item.user === user._id);
+                        const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
 
                         return {
                             avatar: user.avatar,
                             name: user.name,
-                            report: report && report._id,
+                            report: report && report.id,
                         };
                     });
 
-                return (
-                    <RowView
-                        key={dueDate._id}
-                        item={dueDate}
-                        groups={groups}
-                        manage={manage}
-                        users={dueDateUsers}
-                        onSave={this.props.onSave}
-                        onDelete={this.props.onDelete}
-                    />
-                );
+                return <RowView
+                    key={dueDate.id}
+                    item={dueDate}
+                    manage={manage}
+                    users={dueDateUsers}
+                />;
             });
+        }
 
         return (
             <div className="all-status-reports content-inner">
@@ -244,19 +311,13 @@ export default class AllStatusReports extends React.Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {dueDates}
+                            {content}
                         </tbody>
                         {manage && (
                             <tfoot>
                                 <tr>
                                     <td colSpan="4">
-                                        <button
-                                            type="button"
-                                            className="btn btn-default"
-                                            id="add"
-                                            onClick={this.onAddClicked}>
-                                            Add new due date
-                                        </button>
+                                        <AddButton />
                                     </td>
                                 </tr>
                             </tfoot>

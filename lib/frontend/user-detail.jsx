@@ -3,6 +3,7 @@
 import CalendarHeatmap from 'cal-heatmap';
 import moment from 'moment';
 import React from 'react';
+import { compose, graphql } from 'react-apollo';
 import ReactDOM from 'react-dom';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
@@ -10,8 +11,12 @@ import showdown from 'showdown';
 import { Link } from 'react-router-dom';
 import _ from 'underscore';
 
-import { fetchProjects } from './redux/modules/projects';
-import { saveUser } from './redux/modules/users';
+import { ALL_GROUPS_QUERY } from './api/group';
+import {
+    MENTORS_QUERY,
+    USER_DETAIL_QUERY,
+    saveUser,
+} from './api/user';
 import Editable from './editable';
 import { intersectionExists } from './util';
 
@@ -189,7 +194,7 @@ class Links extends React.Component {
     deleteLink(index) {
         const links = Array.from(this.props.items);
         links.splice(index, 1);
-        this.props.onChange(links);
+        this.save(links);
     }
 
     saveLink(index, link) {
@@ -201,19 +206,44 @@ class Links extends React.Component {
             links.push(link);
         }
 
-        this.props.onChange(links);
+        this.save(links);
+    }
+
+    save(links) {
+        this.props.onChange(links.map(link => ({
+            color: link.color,
+            href: link.href,
+            text: link.text,
+        })));
     }
 }
 
 
-@connect(state => ({
-    groups: state.groups,
-    manage: state.manage,
-    users: state.users,
-}))
+@compose(
+    graphql(ALL_GROUPS_QUERY, { name: 'groups' }),
+    graphql(MENTORS_QUERY, { name: 'mentors' }),
+    connect(state => ({
+        manage: state.manage,
+    }))
+)
 class UserBio extends React.Component {
     render() {
-        const { groups, manage, users, user } = this.props;
+        const {
+            groups: {
+                loading: groupsLoading,
+                groups,
+            },
+            mentors: {
+                loading: mentorsLoading,
+                users: mentors,
+            },
+            manage,
+            user,
+        } = this.props;
+
+        if (groupsLoading || mentorsLoading) {
+            return <span className="fas fa-sync fa-spin" />;
+        }
 
         // school editor
         const schoolEditableOptions = {
@@ -239,14 +269,6 @@ class UserBio extends React.Component {
         };
 
         // primary mentor editor
-        const mentors = users.items
-            .filter(user => user.type === 'mentor')
-            .map(user => ({
-                id: user._id,
-                avatar: user.avatar,
-                name: user.name,
-            }));
-
         const formatMentor = data => dedent`
             <div>
                 <img src="${data.avatar}" class="mentor-choice" />
@@ -297,13 +319,10 @@ class UserBio extends React.Component {
             selectize: {
                 create: true,
                 delimiter: ',',
-                options: groups.items
-                    .map(group => group.group_id)
-                    .sort()
-                    .map(group => ({
-                        text: group,
-                        value: group,
-                    })),
+                options: groups.map(group => ({
+                    text: group.group_id,
+                    value: group.group_id,
+                })),
                 plugins: ['remove_button'],
             },
             unsavedclass: null,
@@ -426,48 +445,6 @@ class Timeline extends React.Component {
 }
 
 
-@connect(state => {
-    const { projects: { isFetching, items: projects }} = state;
-    return {
-        isFetching,
-        projects,
-    };
-})
-class Projects extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props;
-        dispatch(fetchProjects());
-    }
-
-    render() {
-        const { isFetching, projects, user } = this.props;
-
-        if (isFetching) {
-            return <span className="fas fa-sync fa-spin" />;
-        }
-
-        const tasks = [].concat(...(
-            Object.values(projects).map(section => section.tasks)))
-            .filter(task => task.assignee === user.email);
-
-        return (
-            <ul className="link-list">
-                {tasks.map(task => (
-                    <li key={task.id}>
-                        <Link to={`/projects/${task.id}`}>
-                            {task.completed && (
-                                <span style={{color: 'green'}}>[Completed]</span>
-                            )}
-                            {task.name}
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        );
-    }
-}
-
-
 const SummaryEntry = props => (
     <div className={`summary-entry ${props.className || ''}`}>
         <div className="summary-entry-title">{props.title}</div>
@@ -543,73 +520,18 @@ class ChatHistory extends React.Component {
 }
 
 
-@connect(
-    (state, props) => {
-        const {
-            manage,
-            statusReports,
-            statusReportDueDates,
-            users,
-        } = state;
-
-        const slackUsername = props.match.params.userId;
-        const user = users.items.find(user => user.slack_username === slackUsername);
-        const events = [];
-        let usersStatusReports = null;
-
-        if (user) {
-            const usersGroups = new Set(user.groups);
-            const now = moment();
-            const usersDueDates = statusReportDueDates.items
-                .filter(dueDate => intersectionExists(new Set(dueDate.show_to_groups), usersGroups))
-                .sort((a, b) => a.date.diff(b.date));
-
-            const filteredStatusReports = statusReports.items
-                .filter(report => report.user === user._id);
-
-            usersStatusReports = usersDueDates.map(dueDate => {
-                const statusReport = filteredStatusReports.find(
-                    report => report.date_due === dueDate._id);
-                const due = moment(dueDate.date);
-
-                if (statusReport) {
-                    const dateSubmitted = moment(statusReport.date_submitted);
-                    const late = due < dateSubmitted;
-                    const link = `/status/view/${statusReport._id}`;
-
-                    events.push({
-                        date: dateSubmitted,
-                        iconFAClass: 'fa-list-ul',
-                        linkURL: link,
-                        summary: late
-                            ? `Status Report (was due ${due.format('ddd. MMM D')})`
-                            : 'Status Report',
-                    });
-
-                    return {
-                        href: link,
-                        late: late,
-                        text: due.format('D MMM YYYY'),
-                    }
-                } else {
-                    return {
-                        text: due.format('D MMM YYYY'),
-                        missing: due < now,
-                    };
-                }
-            });
-        }
-
-        return {
-            events,
-            manage,
-            statusReports: usersStatusReports,
-            user,
-        };
-    },
-    dispatch => ({
-        onSave: item => dispatch(saveUser(item)),
-    })
+@compose(
+    saveUser,
+    graphql(USER_DETAIL_QUERY, {
+        options: props => ({
+            variables: {
+                slack_username: props.match.params.userId,
+            },
+        }),
+    }),
+    connect(state => ({
+        manage: state.manage,
+    }))
 )
 export default class UserDetail extends React.Component {
     rbLogoURL = '/images/reviewboard-logo.png';
@@ -624,21 +546,23 @@ export default class UserDetail extends React.Component {
         this.state = {
             codeReviews: null,
             events: [],
-            statusReports: null,
             reviewRequests: null,
         };
     }
 
-    save(attrs) {
-        this.props.onSave(Object.assign({}, this.props.user, attrs));
+    save(newAttrs) {
+        this.props.mutate({
+            variables: Object.assign({}, this.props.data.user, newAttrs),
+        });
     }
+
 
     componentDidMount() {
         this.update();
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.user !== this.props.user) {
+        if (prevProps.data.user !== this.props.data.user) {
             this.update();
         }
     }
@@ -650,7 +574,7 @@ export default class UserDetail extends React.Component {
             reviewRequests: null,
         });
 
-        if (this.props.user) {
+        if (this.props.data.user) {
             this.events = [];
             this.updateCodeReviews();
             this.updateReviewRequests();
@@ -658,7 +582,7 @@ export default class UserDetail extends React.Component {
     }
 
     updateCodeReviews() {
-        fetch(`/api/reviews/${this.props.user.rb_username}`)
+        fetch(`/api/reviews/${this.props.data.user.rb_username}`)
             .then(result => result.json())
             .then(result => {
                 const events = Array.from(this.events);
@@ -691,7 +615,7 @@ export default class UserDetail extends React.Component {
     }
 
     updateReviewRequests() {
-        fetch(`/api/review-requests/${this.props.user.rb_username}`)
+        fetch(`/api/review-requests/${this.props.data.user.rb_username}`)
             .then(result => result.json())
             .then(result => {
                 const reviewRequests = [];
@@ -737,37 +661,77 @@ export default class UserDetail extends React.Component {
 
     render() {
         const {
-            events,
+            data: {
+                loading,
+                error,
+                user,
+            },
             manage,
-            statusReports,
-            user,
         } = this.props;
         const {
             codeReviews,
             reviewRequests,
         } = this.state;
 
-        if (!user) {
-            return <span className="fas fa-sync fa-spin" />;
+        if (loading) {
+            return <div className="spinner"><span className="fas fa-sync fa-spin" /></div>;
         }
 
-        const statusReportsItems = statusReports === null
-            ? <span className="fas fa-sync fa-spin" />
-            : statusReports.map(statusReport => (
-                <li key={`${statusReport.href}-${statusReport.text}`}>
-                    {statusReport.href ? (
-                        <Link to={statusReport.href}>
-                            {statusReport.text}
-                            {statusReport.late && <span className="text-warning"> (late)</span>}
+        const events = user.status_reports.map(report => {
+            const due = moment(report.date_due.date);
+            const submitted = report.date_submitted ? moment(report.date_submitted) : due;
+
+            return {
+                date: submitted,
+                iconFAClass: 'fa-list-ul',
+                linkURL: `/status/view/${report.id}`,
+                summary: due < submitted
+                    ? `Status Report (was due ${due.format('ddd, MMM D')})`
+                    : 'Status Report',
+            };
+        });
+
+        let statusReportsItems;
+
+        if (user.status_report_due_dates && user.status_report_due_dates.length) {
+            // New-style status reports.
+            statusReportsItems = user.status_report_due_dates.map(dueDate => {
+                const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
+                const due = moment(dueDate.date);
+                let content;
+
+                if (report) {
+                    const late = due < moment(report.date_submitted);
+                    content = (
+                        <Link to={`/status/view/${report.id}`}>
+                            {due.format('YYYY-MM-DD')}
+                            {late && <span className="text-warning"> (late)</span>}
                         </Link>
-                    ) : (
+                    );
+                } else {
+                    content = (
                         <span>
-                            {statusReport.text}
-                            {statusReport.missing && <span className="text-danger"> (missing)</span>}
+                            {due.format('YYYY-MM-DD')}
+                            <span className="text-danger"> (missing)</span>
                         </span>
-                    )}
-                </li>
-            ));
+                    );
+                }
+
+                return <li key={dueDate.id}>{content}</li>;
+            });
+        } else {
+            // Old-style status reports.
+            statusReportsItems = user.status_reports
+                .map(report => Object.assign({}, report, {
+                    due: moment(report.date_due.date),
+                }))
+                .sort((a, b) => a.due.diff(b.due))
+                .map(report => (
+                    <li key={report.id}>
+                        <a href={report.href}>{moment(report.date_due.date).format('YYYY-MM-DD')}</a>
+                    </li>
+                ));
+        }
 
         const reviewRequestItems = reviewRequests === null
             ? <span className="fas fa-sync fa-spin" />
@@ -811,35 +775,32 @@ export default class UserDetail extends React.Component {
                 </Helmet>
                 <UserBio user={user} save={this.save} />
                 <SummaryEntry title="Projects">
-                    {(user.projects && user.projects.length) ? (
-                        <Links
-                            items={user.projects}
-                            onChange={links => this.save({ projects: links })}
-                            manage={manage}
-                        />
-                    ) : (
-                        <Projects user={user} />
-                    )}
+                    <ul className="link-list">
+                        {user.projects.map(project => (
+                            <li key={project.id}>
+                                {project.href ? (
+                                    <a href={project.href}>{project.name}</a>
+                                ) : (
+                                    <Link to={`/projects/${project.id}`}>
+                                        {project.completed && <span style={{color: 'green'}}>[Completed] </span>}
+                                        {project.name}
+                                    </Link>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
                 </SummaryEntry>
                 <SummaryEntry title="Demo Videos">
                     <Links
                         items={user.demos}
-                        onChange={links => this.save({ demos: links })}
+                        onChange={demos => this.save({ demos })}
                         manage={manage}
                     />
                 </SummaryEntry>
                 <SummaryEntry title="Status Reports">
-                    {(user.status_reports && user.status_reports.length) ? (
-                        <Links
-                            items={user.status_reports}
-                            onChange={links => this.save({ status_reports: links })}
-                            manage={manage}
-                        />
-                    ) : (
-                        <ul className="link-list">
-                            {statusReportsItems}
-                        </ul>
-                    )}
+                    <ul className="link-list">
+                        {statusReportsItems}
+                    </ul>
                 </SummaryEntry>
                 <SummaryEntry title="Chat History">
                     <ChatHistory slack_username={user.slack_username} />

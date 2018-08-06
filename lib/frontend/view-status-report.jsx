@@ -2,69 +2,62 @@
 
 import moment from 'moment';
 import React from 'react';
+import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
-import { connect } from 'react-redux';
 import showdown from 'showdown';
 
+import { VIEW_STATUS_REPORT_QUERY } from './api/status-report';
 
-@connect((state, props) => {
-    const {
-        statusReportDueDates,
-        statusReports,
-        users,
-    } = state;
 
-    const report = statusReports.items
-        .find(report => report._id === props.match.params.reportId);
-    let dueDate = null;
-    let user = null;
-
-    if (report) {
-        dueDate = statusReportDueDates.items
-            .find(dueDate => dueDate._id === report.date_due);
-        user = users.items.find(user => user._id === report.user);
-    }
-
-    return {
-        dueDate,
-        report,
-        user,
-    };
+@graphql(VIEW_STATUS_REPORT_QUERY, {
+    options: props => ({
+        variables: {
+            status_report: props.match.params.reportId,
+        },
+    }),
 })
 export default class ViewStatusReport extends React.Component {
     render() {
-        const {
-            dueDate,
-            report,
-            user,
-        } = this.props;
+        const { data: { loading, error, status_report } } = this.props;
 
-        let data = null;
+        let content;
 
-        if (report) {
-            // TODO: show error + raw text if markdown fails
+        if (loading) {
+            content = (
+                <div className="spinner">
+                    <span className="fas fa-sync fa-spin"></span>
+                </div>
+            );
+        } else if (error) {
+            content = (
+                <React.Fragment>
+                    <span className="fas fa-exclamation-triangle"></span>
+                    {error}
+                </React.Fragment>
+            );
+        } else {
             const converter = new showdown.Converter();
             converter.setFlavor('github');
 
-            const content = { __html: converter.makeHtml(report.text) };
-            const dateString = moment(dueDate.date).format('ddd, MMM D');
+            const rendered = { __html: converter.makeHtml(status_report.text) };
+            const dateString = moment(status_report.date_due.date).format('ddd, MMM D');
 
-            data = (
+            content = (
                 <React.Fragment>
                     <Helmet>
-                        <title>Status Report for {user.name} {dateString} - Student Sonar</title>
+                        <title>Status Report for {status_report.user.name} {dateString} - Student Sonar</title>
                     </Helmet>
                     <div className="page-header">
                         <h1>
                             Status Report for {dateString}
-                            <span className="small">{user.name}</span>
+                            <span className="small">{status_report.user.name}</span>
                         </h1>
                     </div>
-                    <div dangerouslySetInnerHTML={content} />
+                    <div dangerouslySetInnerHTML={rendered} />
                 </React.Fragment>
             );
         }
 
-        return <div className="view-status-report content-inner">{data}</div>;
+        return <div className="view-status-report content-inner">{content}</div>;
     }
 }
