@@ -28,6 +28,8 @@ class SidebarItem extends React.Component {
 @withRouter
 @connect(state => ({
     groups: state.groups,
+    isMentor: state.userType === 'mentor',
+    loggedIn: state.loggedIn,
     users: state.users,
 }))
 export default class Sidebar extends React.Component {
