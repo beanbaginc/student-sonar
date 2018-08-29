@@ -29,7 +29,7 @@ class PermissionDenied extends React.Component {
                 <div className="page-header">
                     <h1>Permission Denied</h1>
                 </div>
-                {props.loggedIn ? (
+                {this.props.loggedIn ? (
                     <p>
                         You do not have access to this page. If you believe this is
                         an error, please contact your mentors.
