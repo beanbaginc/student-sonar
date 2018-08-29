@@ -551,9 +551,16 @@ export default class UserDetail extends React.Component {
     }
 
     save(newAttrs) {
-        this.props.mutate({
-            variables: Object.assign({}, this.props.data.user, newAttrs),
-        });
+        const variables = Object.assign({}, this.props.data.user, newAttrs);
+
+        // Filter out unexpected things from the links list.
+        variables.demos = variables.demos.map(demo => ({
+            color: demo.color,
+            href: demo.href,
+            text: demo.text,
+        }));
+
+        this.props.mutate({ variables });
     }
 
 
