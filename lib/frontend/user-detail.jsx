@@ -1,6 +1,5 @@
 // jshint ignore: start
 
-import CalendarHeatmap from 'cal-heatmap';
 import moment from 'moment';
 import React from 'react';
 import { compose, graphql } from 'react-apollo';
@@ -457,42 +456,17 @@ class ChatHistory extends React.Component {
     constructor(props) {
         super(props);
 
-        this.heatmap = null;
+        this.state = {
+            months: [],
+            max: 0,
+        };
     }
 
     componentDidMount() {
-        const start = moment().startOf('month').subtract(11, 'months');
-
-        this.heatmap = new CalendarHeatmap();
-        this.heatmap.init({
-            data: [],
-            displayLegend: false,
-            domain: 'month',
-            highlight: 'now',
-            itemSelector: this.el,
-            start: start.toDate(),
-            subDomain: 'day',
-            tooltip: true,
-            weekStartOnMonday: false,
-        });
-
         this.update();
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.slack_username !== prevProps.slack_username) {
-            this.update();
-        }
-    }
-
-    componentWillUnmount() {
-        this.heatmap.destroy();
-        this.heatmap = null;
-    }
-
     update() {
-        this.heatmap.update([]);
-
         fetch(`/api/slack-logs/${this.props.slack_username}`)
             .then(result => result.json())
             .then(logs => {
@@ -508,14 +482,120 @@ class ChatHistory extends React.Component {
                     }
                 }
 
-                if (this.heatmap) {
-                    this.heatmap.update(data);
+                const today = moment();
+                const date = moment().startOf('month').subtract(11, 'months');
+                const months = [];
+
+                for (let i = 0; i < 12; i++) {
+                    const month = {
+                        days: [],
+                        name: date.format('MMMM'),
+                    };
+
+                    let week = -1;
+                    let currentMonth = date.month();
+
+                    while (date.month() === currentMonth) {
+                        const dayOfWeek = date.day();
+                        const count = data[date.unix().toString()] || 0;
+
+                        if (dayOfWeek === 0 || week === -1) {
+                            week++;
+                        }
+
+                        const title = (count
+                            ? `${count} items on ${date.format('LL')}`
+                            : date.format('LL'));
+
+                        month.days.push({
+                            week: week,
+                            day: dayOfWeek,
+                            count: count,
+                            title: title,
+                            today: date.isSame(today, 'day'),
+                        });
+
+                        date.add(1, 'day');
+                    }
+
+                    month.totalWeeks = week + 1;
+
+                    months.push(month);
                 }
+
+                const max = Math.max(
+                    Math.max.apply(Math, Object.values(data)),
+                    30);
+
+                this.setState({
+                    months,
+                    max,
+                });
             });
     }
 
     render() {
-        return <div ref={el => this.el = el} />;
+        const { months, max } = this.state;
+
+        let x = 0;
+
+        const monthEntries = months.map(month => {
+            const width = (month.totalWeeks * 10) + ((month.totalWeeks - 1) * 2);
+
+            const days = month.days.map(day => {
+                const valueClasses = ['', 'q1', 'q2', 'q3', 'q4', 'q5'];
+
+                const valueClass = valueClasses[
+                    Math.ceil((Math.min(day.count, max) / max) *
+                              (valueClasses.length - 1))];
+                const highlightClass = day.today ? 'highlight-now now' : '';
+                const rectClass = `graph-rect ${valueClass} ${highlightClass}`;
+
+                return (
+                    <g>
+                        <rect
+                            className={rectClass}
+                            x={day.week * 12}
+                            y={day.day * 12}
+                            width="10"
+                            height="10">
+                            <title>{day.title}</title>
+                        </rect>
+                    </g>
+                );
+            });
+
+            const entry = (
+                <svg width={width + 4} height="111" x={x} y="0" className="graph-domain">
+                    <rect
+                        width={width}
+                        height="107"
+                        className="domain-background"
+                    />
+                    <svg x="0" y="0" className="graph-subdomain-group">
+                        {days}
+                    </svg>
+                    <text
+                        className="graph-label"
+                        x={width / 2}
+                        y="96.5"
+                        text-anchor="middle"
+                        dominant-baseline="middle">
+                        {month.name}
+                    </text>
+                </svg>
+            );
+
+            x += width + 8;
+
+            return entry;
+        });
+
+        return (
+            <svg className="cal-heatmap-container" x="0" y="0" width={x} height="107">
+                {monthEntries}
+            </svg>
+        );
     }
 }
 

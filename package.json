@@ -30,7 +30,6 @@
     "bootstrap": "^3.3.7",
     "bootstrap-datepicker": "^1.8.0",
     "bootstrap-toggle": "^2.2.2",
-    "cal-heatmap": "^3.6.2",
     "compression-webpack-plugin": "^1.1.11",
     "connect-mongo": "^2.0.1",
     "css-loader": "^1.0.0",
