@@ -17,7 +17,6 @@ import {
     saveUser,
 } from './api/user';
 import Editable from './editable';
-import { intersectionExists } from './util';
 
 
 class LinkEditable extends $.fn.editabletypes.abstractinput {

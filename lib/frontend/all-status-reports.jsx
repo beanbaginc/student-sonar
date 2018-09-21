@@ -16,7 +16,6 @@ import {
 import { ACTIVE_STATUS_REPORTS_QUERY } from './api/user';
 import confirm from './confirm';
 import Editable from './editable';
-import {intersectionExists} from './util';
 
 
 @deleteStatusReportDueDate

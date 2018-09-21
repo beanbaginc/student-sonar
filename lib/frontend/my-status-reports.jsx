@@ -7,7 +7,6 @@ import Helmet from 'react-helmet';
 import { Link } from 'react-router-dom';
 
 import { MY_STATUS_REPORTS_QUERY } from './api/user';
-import {intersectionExists} from './util';
 
 
 @graphql(MY_STATUS_REPORTS_QUERY, {
