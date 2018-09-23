@@ -538,10 +538,10 @@ class ChatHistory extends React.Component {
 
         let x = 0;
 
-        const monthEntries = months.map(month => {
+        const monthEntries = months.map((month, i) => {
             const width = (month.totalWeeks * 10) + ((month.totalWeeks - 1) * 2);
 
-            const days = month.days.map(day => {
+            const days = month.days.map((day, j) => {
                 const valueClasses = ['', 'q1', 'q2', 'q3', 'q4', 'q5'];
 
                 const valueClass = valueClasses[
@@ -551,7 +551,7 @@ class ChatHistory extends React.Component {
                 const rectClass = `graph-rect ${valueClass} ${highlightClass}`;
 
                 return (
-                    <g>
+                    <g key={`${i}-${j}`}>
                         <rect
                             className={rectClass}
                             x={day.week * 12}
@@ -565,7 +565,7 @@ class ChatHistory extends React.Component {
             });
 
             const entry = (
-                <svg width={width + 4} height="111" x={x} y="0" className="graph-domain">
+                <svg key={i} width={width + 4} height="111" x={x} y="0" className="graph-domain">
                     <rect
                         width={width}
                         height="107"
@@ -578,8 +578,8 @@ class ChatHistory extends React.Component {
                         className="graph-label"
                         x={width / 2}
                         y="96.5"
-                        text-anchor="middle"
-                        dominant-baseline="middle">
+                        textAnchor="middle"
+                        dominantBaseline="middle">
                         {month.name}
                     </text>
                 </svg>
@@ -780,6 +780,8 @@ export default class UserDetail extends React.Component {
         let statusReportsItems;
 
         if (user.status_report_due_dates && user.status_report_due_dates.length) {
+            const today = moment().endOf('day');
+
             // New-style status reports.
             statusReportsItems = user.status_report_due_dates.map(dueDate => {
                 const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
@@ -787,20 +789,23 @@ export default class UserDetail extends React.Component {
                 let content;
 
                 if (report) {
-                    const late = due < moment(report.date_submitted);
+                    console.log('due %s, submitted %s', dueDate.date, report.date_submitted);
+                    const late = due.isBefore(report.date_submitted);
                     content = (
                         <Link to={`/status/view/${report.id}`}>
                             {due.format('YYYY-MM-DD')}
                             {late && <span className="text-warning"> (late)</span>}
                         </Link>
                     );
-                } else {
+                } else if (due.isBefore(today)) {
                     content = (
                         <span>
                             {due.format('YYYY-MM-DD')}
                             <span className="text-danger"> (missing)</span>
                         </span>
                     );
+                } else {
+                    content = <span>{due.format('YYYY-MM-DD')}</span>;
                 }
 
                 return <li key={dueDate.id}>{content}</li>;

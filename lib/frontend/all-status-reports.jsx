@@ -132,7 +132,7 @@ class RowView extends React.Component {
         };
 
         return (
-            <tr className={item.date < moment() ? (missing > 0 ? 'danger' : 'success') : null}>
+            <tr className={item.date < moment().endOf('day') ? (missing > 0 ? 'danger' : 'success') : null}>
                 <td className="date-column">
                     <Editable
                         options={dateEditableOptions}
