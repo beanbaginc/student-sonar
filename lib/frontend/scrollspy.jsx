@@ -1,7 +1,17 @@
 // jshint ignore: start
 
-import _ from 'underscore';
 import React from 'react';
+
+
+function debounce(func, wait) {
+    let timeout;
+
+    return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    }
+}
 
 
 export default class ScrollSpy extends React.Component {
@@ -19,7 +29,7 @@ export default class ScrollSpy extends React.Component {
 
         this._$content.scrollspy({ target: this.props.nav });
         this._$nav.on({
-            'activate.bs.scrollspy': _.debounce(this._onActiveChanged, 50),
+            'activate.bs.scrollspy': debounce(this._onActiveChanged, 50),
             'click': this._onNavClicked,
         });
     }

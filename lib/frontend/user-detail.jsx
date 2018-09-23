@@ -8,7 +8,6 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import showdown from 'showdown';
 import { Link } from 'react-router-dom';
-import _ from 'underscore';
 
 import { ALL_GROUPS_QUERY } from './api/group';
 import {
@@ -22,13 +21,6 @@ import Editable from './editable';
 class LinkEditable extends $.fn.editabletypes.abstractinput {
     constructor(options) {
         super();
-
-        this._template = _.template(`
-            <a
-                <% if (href) { %>href="<%- href %>" <% } %>
-                <% if (color) { %>style="color: <%- color %>;" <% } %>
-                ><%- text %></a>
-            `);
 
         this.init('link', options, {
             inputclass: '',
@@ -100,6 +92,13 @@ class LinkEditable extends $.fn.editabletypes.abstractinput {
     activate() {
         this._$text.focus();
     }
+
+    _template(value) {
+        const href = value.href ? `href="${value.href}"` : '';
+        const color = value.color ? `style="color: ${value.color};"` : '';
+
+        return `<a ${href} ${color}>${value.text}</a>`;
+    }
 }
 
 $.fn.editabletypes.link = LinkEditable;
@@ -166,8 +165,8 @@ class Links extends React.Component {
                     <Editable
                         options={editableOptions}
                         onChange={link => this.saveLink(null, link)}
-                        onInit={(e, editable) => _.delay(() => editable.show(), 100)}
-                        onHide={() => _.delay(() => this.setState({ adding: false }), 100)}>
+                        onInit={(e, editable) => setTimeout(() => editable.show(), 100)}
+                        onHide={() => setTimeout(() => this.setState({ adding: false }), 100)}>
                         <a>New link</a>
                     </Editable>
                 </li>
@@ -402,9 +401,16 @@ class UserBio extends React.Component {
 
 class Timeline extends React.Component {
     render() {
-        const events = _.groupBy(
-            this.props.events,
-            event => event.date.startOf('day').unix());
+        const events = {};
+        this.props.events.forEach(event => {
+            const date = event.date.startOf('day').unix();
+
+            if (events.hasOwnProperty(date)) {
+                events[date].push(event);
+            } else {
+                events[date] = [event];
+            }
+        });
 
         const days = Object.keys(events)
             .sort()
@@ -789,7 +795,6 @@ export default class UserDetail extends React.Component {
                 let content;
 
                 if (report) {
-                    console.log('due %s, submitted %s', dueDate.date, report.date_submitted);
                     const late = due.isBefore(report.date_submitted);
                     content = (
                         <Link to={`/status/view/${report.id}`}>
