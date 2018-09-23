@@ -5,8 +5,7 @@ const CompressionPlugin = require("compression-webpack-plugin");
 
 
 module.exports = {
-    mode: 'production',
-    //mode: 'development',
+    mode: (process.env.NODE_ENV === 'production' ? 'production' : 'development'),
     entry: path.join(__dirname, 'lib', 'frontend', 'main.js'),
     output: {
         path: path.join(__dirname, 'build', 'scripts'),

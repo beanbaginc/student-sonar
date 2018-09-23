@@ -130,7 +130,7 @@ export default class EditStatusReport extends React.Component {
                     date_due: status_report.date_due.id,
                     id: status_report.id,
                     user: window.userId,
-                    text: this.state.value.text,
+                    text: this.state.value ? this.state.value.text : '',
                 },
             });
         };
