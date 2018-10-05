@@ -12,6 +12,7 @@ import errorHandler from 'errorhandler';
 import express from 'express';
 import logger from 'morgan';
 import passport from 'passport';
+import { init as sentryInit } from '@sentry/node';
 import session from 'express-session';
 
 import routes from './lib/routes';
@@ -20,6 +21,12 @@ import init from './lib/init';
 
 init()
     .then(options => {
+        if (options.config.sentryDsnBackend) {
+            sentryInit({
+                dsn: options.config.sentryDsnBackend,
+            });
+        }
+
         const app = express();
         app.get('*.js', (req, res, next) => {
             req.url = req.url + '.gz';
