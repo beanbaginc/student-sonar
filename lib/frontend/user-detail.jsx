@@ -54,11 +54,7 @@ class LinkEditable extends $.fn.editabletypes.abstractinput {
     }
 
     value2html(value, element) {
-        if (!value) {
-            $(element).empty();
-        } else {
-            $(element).html(this._template(value));
-        }
+        element.innerHTML = value ? this._template(value) : '';
     }
 
     html2value(html) {
@@ -254,10 +250,7 @@ class UserBio extends React.Component {
         const emailEditableOptions = {
             disabled: !manage,
             display: function(value) {
-                $('<a>')
-                    .attr('href', `mailto:${value}`)
-                    .text(value)
-                    .appendTo($(this).empty());
+                this.innerHTML = `<a href="mailto:${value}">${value}</a>`;
             },
             mode: 'inline',
             type: 'text',
@@ -292,7 +285,7 @@ class UserBio extends React.Component {
             unsavedclass: null,
             display: function(value) {
                 const mentor = mentors.find(i => i.id === value);
-                $(this).html(mentor ? formatMentor(mentor) : '');
+                this.innerHTML = mentor ? formatMentor(mentor) : '';
             },
             value: user.primary_mentor,
         };
@@ -855,7 +848,7 @@ export default class UserDetail extends React.Component {
         const notesEditableOptions = {
             disabled: !manage,
             display: function(value) {
-                $(this).html(converter.makeHtml(value));
+                this.innerHTML = converter.makeHtml(value);
             },
             mode: 'inline',
             showbuttons: 'bottom',

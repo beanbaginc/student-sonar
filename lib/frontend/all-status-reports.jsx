@@ -136,16 +136,11 @@ class RowView extends React.Component {
                 <td className="date-column">
                     <Editable
                         options={dateEditableOptions}
-                        onChange={value => this.onSave({ date: value })}
-                        onShow={() => this.$deleteButton.hide()}
-                        onHide={() => this.$deleteButton.show()}>
+                        onChange={value => this.onSave({ date: value })}>
                         {item.date.format('YYYY-MM-DD')}
                     </Editable>
                     {manage && (
-                        <DeleteButton
-                            item={item}
-                            ref={el => this.$deleteButton = el ? $(el) : $()}
-                        />
+                        <DeleteButton item={item} />
                     )}
                 </td>
                 <td>
