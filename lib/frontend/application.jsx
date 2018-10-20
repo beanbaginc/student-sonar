@@ -126,13 +126,7 @@ export default class Application extends React.Component {
                         <Route
                             path="/status/view/:reportId" exact
                             render={props => (
-                                <React.Fragment>
-                                    {loggedIn ? (
-                                        <ViewStatusReport {...props} />
-                                    ) : (
-                                        <PermissionDenied />
-                                    )}
-                                </React.Fragment>
+                                <ViewStatusReport {...props} />
                             )}
                         />
                         <Route
