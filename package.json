@@ -6,7 +6,8 @@
   "scripts": {
     "start": "./node_modules/.bin/babel-node --presets env --plugins dedent,transform-object-rest-spread server.js",
     "postinstall": "./node_modules/.bin/gulp",
-    "webpack": "./node_modules/.bin/webpack"
+    "webpack": "./node_modules/.bin/webpack",
+    "load-slack-users": "./node_modules/.bin/babel-node --presets env bin/load-slack-users.js"
   },
   "engines": {
     "node": "8.x"

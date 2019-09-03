@@ -1,5 +1,3 @@
-#!/usr/bin/env ./node_modules/.bin/babel-node --presets env
-
 import init from '../lib/init';
 import schema from '../lib/schema';
 import Slack from '../lib/slack';
@@ -39,7 +37,7 @@ function updateUser(user) {
 }
 
 init()
-    .then(function(options) {
+    .then(options => {
         const slack = new Slack(options.config);
 
         return slack.getUsers()
