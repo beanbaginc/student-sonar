@@ -35,7 +35,8 @@ export default class Calendar extends React.Component {
                 let dateText;
 
                 if (item.all_day) {
-                    dateText = moment(item.start).format('ddd, DD MMM YYYY');
+                    const date = moment(item.start).utc();
+                    dateText = date.format('ddd, DD MMM YYYY');
                 } else {
                     const start = moment(item.start);
                     const end = moment(item.end);
