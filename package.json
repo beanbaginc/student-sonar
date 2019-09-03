@@ -9,7 +9,7 @@
     "webpack": "./node_modules/.bin/webpack"
   },
   "engines": {
-    "node": "8.9.1"
+    "node": "8.x"
   },
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
