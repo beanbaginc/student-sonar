@@ -55,7 +55,7 @@
     "less-loader": "^4.1.0",
     "memjs": "^1.2.0",
     "moment": "^2.24.0",
-    "mongoose": "^5.2.5",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.0",
     "newrelic": "^4.6.0",
     "node-fetch": "^2.2.0",
