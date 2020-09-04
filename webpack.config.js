@@ -14,6 +14,11 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.mjs$/,
+                include: /node_modules/,
+                type: 'javascript/auto',
+            },
+            {
                 test: /\.js(x*)$/,
                 exclude: /node_modules/,
                 loader: 'babel-loader',

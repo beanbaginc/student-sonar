@@ -12,13 +12,13 @@ import { VIEW_STATUS_REPORT_QUERY } from './api/status-report';
 @graphql(VIEW_STATUS_REPORT_QUERY, {
     options: props => ({
         variables: {
-            status_report: props.match.params.reportId,
+            statusReport: props.match.params.reportId,
         },
     }),
 })
 export default class ViewStatusReport extends React.Component {
     render() {
-        const { data: { loading, error, status_report } } = this.props;
+        const { data: { loading, error, statusReport } } = this.props;
 
         let content;
 
@@ -39,18 +39,18 @@ export default class ViewStatusReport extends React.Component {
             const converter = new showdown.Converter();
             converter.setFlavor('github');
 
-            const rendered = { __html: converter.makeHtml(status_report.text) };
-            const dateString = moment(status_report.date_due.date).format('ddd, MMM D');
+            const rendered = { __html: converter.makeHtml(statusReport.text) };
+            const dateString = moment(statusReport.dateDue.date).format('ddd, MMM D');
 
             content = (
                 <React.Fragment>
                     <Helmet>
-                        <title>Status Report for {status_report.user.name} {dateString} - Student Sonar</title>
+                        <title>Status Report for {statusReport.user.name} {dateString} - Student Sonar</title>
                     </Helmet>
                     <div className="page-header">
                         <h1>
                             Status Report for {dateString}
-                            <span className="small">{status_report.user.name}</span>
+                            <span className="small">{statusReport.user.name}</span>
                         </h1>
                     </div>
                     <div dangerouslySetInnerHTML={rendered} />

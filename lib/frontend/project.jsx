@@ -32,7 +32,7 @@ export default class Project extends React.Component {
         // avatar in a link.
         if (avatar && userType === 'mentor') {
             avatar = (
-                <Link to={`/users/${user.slack_username}`} className="user-avatar">
+                <Link to={`/users/${user.slackUsername}`} className="user-avatar">
                     {avatar}
                 </Link>
             );

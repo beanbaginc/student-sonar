@@ -9,16 +9,16 @@ type Query {
     groups(active: Boolean = false): [Group!]!
     project(id: ID!): Project
     projects: [Project!]!
-    status_report(date_due: ID, id: ID, user: ID): StatusReport
-    status_report_due_dates(active: Boolean = false): [StatusReportDueDate!]!
-    user(id: ID = null, slack_username: String = null): User
-    users(active: Boolean = false, is_mentor: Boolean = null): [User!]!
+    statusReport(dateDue: ID, id: ID, user: ID): StatusReport
+    statusReportDueDates(active: Boolean = false): [StatusReportDueDate!]!
+    user(id: ID = null, slackUsername: String = null): User
+    users(active: Boolean = false, isMentor: Boolean = null): [User!]!
 }
 
 
 type Mutation {
     saveStatusReport(
-        date_due: ID!
+        dateDue: ID!
         id: ID
         text: String!
         user: ID!
@@ -31,17 +31,17 @@ type Mutation {
     saveStatusReportDueDate(
         id: ID,
         date: String!,
-        show_to_groups: [String!]!
+        showToGroups: [String!]!
     ): StatusReportDueDate
 
     saveUser(
+        assignedMentor: ID
         demos: [LinkInput!]!,
         email: String,
         groups: [String!]!
         id: ID!
         notes: String,
-        primary_mentor: ID
-        rb_username: String,
+        rbUsername: String,
         school: String,
     ): User
 }
@@ -49,12 +49,12 @@ type Mutation {
 
 type Calendar {
     items: [CalendarItem!]!
-    subscribe_url: String
+    subscribeURL: String
 }
 
 
 type CalendarItem {
-    all_day: Boolean
+    allDay: Boolean
     end: String!
     id: ID!
     start: String!
@@ -63,10 +63,10 @@ type CalendarItem {
 
 
 type Group {
-    group_id: String!
+    groupId: String!
     id: ID!
     name: String!
-    show: Boolean!
+    active: Boolean!
     users: [User!]!
 }
 
@@ -98,8 +98,8 @@ type Project {
 
 
 type StatusReport {
-    date_due: StatusReportDueDate!
-    date_submitted: String
+    dateDue: StatusReportDueDate!
+    dateSubmitted: String
     href: String
     id: ID
     text: String
@@ -110,11 +110,12 @@ type StatusReport {
 type StatusReportDueDate {
     date: String!
     id: ID!
-    show_to_groups: [String!]!
+    showToGroups: [String!]!
 }
 
 
 type User {
+    assignedMentor: ID
     avatar: String
     demos: [Link!]!
     email: String
@@ -122,12 +123,11 @@ type User {
     id: ID!
     name: String
     notes: String
-    primary_mentor: ID
     projects: [Project!]
-    rb_username: String
+    rbUsername: String
     school: String
-    slack_username: String
-    status_report_due_dates: [StatusReportDueDate!]!
-    status_reports: [StatusReport!]!
+    slackUsername: String
+    statusReportDueDates: [StatusReportDueDate!]!
+    statusReports: [StatusReport!]!
     timezone: String
 }

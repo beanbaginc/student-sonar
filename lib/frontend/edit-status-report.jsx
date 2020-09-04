@@ -63,7 +63,7 @@ const defaultContent = dedent`
     graphql(EDIT_STATUS_REPORT_QUERY, {
         options: props => ({
             variables: {
-                date_due: props.match.params.dueDateId,
+                dateDue: props.match.params.dueDateId,
                 user: window.userId,
             },
         }),
@@ -94,7 +94,7 @@ export default class EditStatusReport extends React.Component {
             data: {
                 loading,
                 error,
-                status_report,
+                statusReport,
             },
         } = this.props;
 
@@ -120,15 +120,15 @@ export default class EditStatusReport extends React.Component {
         };
 
         const mdeValue = this.state.value || {
-            text: status_report.text || defaultContent,
+            text: statusReport.text || defaultContent,
             selection: null,
         };
 
         const onSaveClicked = () => {
             this.props.mutate({
                 variables: {
-                    date_due: status_report.date_due.id,
-                    id: status_report.id,
+                    dateDue: statusReport.dateDue.id,
+                    id: statusReport.id,
                     user: window.userId,
                     text: this.state.value ? this.state.value.text : '',
                 },
@@ -139,7 +139,7 @@ export default class EditStatusReport extends React.Component {
             <div className="status-report-editor">
                 <div className={`panel panel-default ${this.state.preview ? 'preview' : ''}`}>
                     <div className="panel-heading">
-                        <span>Status report for {moment(status_report.date_due.date).format('ddd, MMM D')}</span>
+                        <span>Status report for {moment(statusReport.dateDue.date).format('ddd, MMM D')}</span>
 
                         <span className="text-warning">
                             {this.state.unsaved && 'There are unsaved changes'}

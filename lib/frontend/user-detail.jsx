@@ -287,10 +287,10 @@ class UserBio extends React.Component {
                 const mentor = mentors.find(i => i.id === value);
                 this.innerHTML = mentor ? formatMentor(mentor) : '';
             },
-            value: user.primary_mentor,
+            value: user.assignedMentor,
         };
 
-        const initialMentorValue = mentors.find(i => i.id === user.primary_mentor);
+        const initialMentorValue = mentors.find(i => i.id === user.assignedMentor);
 
         // rb username editor
         const rbUsernameEditableOptions = {
@@ -298,7 +298,7 @@ class UserBio extends React.Component {
             mode: 'inline',
             type: 'text',
             unsavedclass: null,
-            value: user.rb_username,
+            value: user.rbUsername,
         };
 
         // groups editor
@@ -310,8 +310,8 @@ class UserBio extends React.Component {
                 create: true,
                 delimiter: ',',
                 options: groups.map(group => ({
-                    text: group.group_id,
-                    value: group.group_id,
+                    text: group.groupId,
+                    value: group.groupId,
                 })),
                 plugins: ['remove_button'],
             },
@@ -355,7 +355,7 @@ class UserBio extends React.Component {
                     <div className="bio-entry">
                         <Editable
                             options={mentorEditableOptions}
-                            onChange={primary_mentor => this.props.save({ primary_mentor })}
+                            onChange={assignedMentor => this.props.save({ assignedMentor })}
                         />
                     </div>
                 </div>
@@ -374,12 +374,12 @@ class UserBio extends React.Component {
                             <dd>
                                 <Editable
                                     options={rbUsernameEditableOptions}
-                                    onChange={rb_username => this.props.save({ rb_username })}
+                                    onChange={rbUsername => this.props.save({ rbUsername })}
                                 />
                             </dd>
 
                             <dt>Slack username:</dt>
-                            <dd>{user.slack_username}</dd>
+                            <dd>{user.slackUsername}</dd>
 
                             <dt>Timezone:</dt>
                             <dd>{user.timezone}</dd>
@@ -465,7 +465,7 @@ class ChatHistory extends React.Component {
     }
 
     update() {
-        fetch(`/api/slack-logs/${this.props.slack_username}`)
+        fetch(`/api/slack-logs/${this.props.slackUsername}`)
             .then(result => result.json())
             .then(logs => {
                 const data = {};
@@ -603,7 +603,7 @@ class ChatHistory extends React.Component {
     graphql(USER_DETAIL_QUERY, {
         options: props => ({
             variables: {
-                slack_username: props.match.params.userId,
+                slackUsername: props.match.params.userId,
             },
         }),
     }),
@@ -667,7 +667,7 @@ export default class UserDetail extends React.Component {
     }
 
     updateCodeReviews() {
-        fetch(`/api/reviews/${this.props.data.user.rb_username}`)
+        fetch(`/api/reviews/${this.props.data.user.rbUsername}`)
             .then(result => result.json())
             .then(result => {
                 const events = Array.from(this.events);
@@ -700,7 +700,7 @@ export default class UserDetail extends React.Component {
     }
 
     updateReviewRequests() {
-        fetch(`/api/review-requests/${this.props.data.user.rb_username}`)
+        fetch(`/api/review-requests/${this.props.data.user.rbUsername}`)
             .then(result => result.json())
             .then(result => {
                 const reviewRequests = [];
@@ -762,9 +762,9 @@ export default class UserDetail extends React.Component {
             return <div className="spinner"><span className="fas fa-sync fa-spin" /></div>;
         }
 
-        const events = user.status_reports.map(report => {
-            const due = moment(report.date_due.date);
-            const submitted = report.date_submitted ? moment(report.date_submitted) : due;
+        const events = user.statusReports.map(report => {
+            const due = moment(report.dateDue.date);
+            const submitted = report.dateSubmitted ? moment(report.dateSubmitted) : due;
 
             return {
                 date: submitted,
@@ -778,17 +778,17 @@ export default class UserDetail extends React.Component {
 
         let statusReportsItems;
 
-        if (user.status_report_due_dates && user.status_report_due_dates.length) {
+        if (user.statusReportDueDates && user.statusReportDueDates.length) {
             const today = moment().endOf('day');
 
             // New-style status reports.
-            statusReportsItems = user.status_report_due_dates.map(dueDate => {
-                const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
+            statusReportsItems = user.statusReportDueDates.map(dueDate => {
+                const report = user.statusReports.find(r => r.dateDue.id === dueDate.id);
                 const due = moment(dueDate.date);
                 let content;
 
                 if (report) {
-                    const late = due.isBefore(report.date_submitted);
+                    const late = due.isBefore(report.dateSubmitted);
                     content = (
                         <Link to={`/status/view/${report.id}`}>
                             {due.format('YYYY-MM-DD')}
@@ -810,14 +810,14 @@ export default class UserDetail extends React.Component {
             });
         } else {
             // Old-style status reports.
-            statusReportsItems = user.status_reports
+            statusReportsItems = user.statusReports
                 .map(report => Object.assign({}, report, {
-                    due: moment(report.date_due.date),
+                    due: moment(report.dateDue.date),
                 }))
                 .sort((a, b) => a.due.diff(b.due))
                 .map(report => (
                     <li key={report.id}>
-                        <a href={report.href}>{moment(report.date_due.date).format('YYYY-MM-DD')}</a>
+                        <a href={report.href}>{moment(report.dateDue.date).format('YYYY-MM-DD')}</a>
                     </li>
                 ));
         }
@@ -892,7 +892,7 @@ export default class UserDetail extends React.Component {
                     </ul>
                 </SummaryEntry>
                 <SummaryEntry title="Chat History">
-                    <ChatHistory slack_username={user.slack_username} />
+                    <ChatHistory slackUsername={user.slackUsername} />
                 </SummaryEntry>
                 <SummaryEntry title="Notes" className="notes-editable">
                     <Editable

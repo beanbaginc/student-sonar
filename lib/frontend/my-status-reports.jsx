@@ -38,8 +38,8 @@ export default class MyStatusReports extends React.Component {
         } else {
             const now = moment();
 
-            content = user.status_report_due_dates.map(dueDate => {
-                const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
+            content = user.statusReportDueDates.map(dueDate => {
+                const report = user.statusReports.find(r => r.dateDue.id === dueDate.id);
                 const date = moment(dueDate.date);
                 const daysLeft = date.diff(now, 'days', true);
 

@@ -83,14 +83,14 @@ class RowView extends React.Component {
             variables: Object.assign({
                 id: item.id,
                 date: item.date.toISOString(),
-                show_to_groups: item.show_to_groups,
+                showToGroups: item.showToGroups,
             }, newAttrs),
         });
     }
 
     render() {
         const { item, manage, users, data: { groups, loading } } = this.props;
-        const showToGroups = item.show_to_groups || [];
+        const showToGroups = item.showToGroups || [];
         const missing = !!users.find(user => user.report === undefined);
 
         if (loading) {
@@ -119,11 +119,11 @@ class RowView extends React.Component {
                 create: true,
                 delimiter: ',',
                 options: groups
-                    .map(group => group.group_id)
+                    .map(group => group.groupId)
                     .sort()
-                    .map(group_id => ({
-                        text: group_id,
-                        value: group_id,
+                    .map(groupId => ({
+                        text: groupId,
+                        value: groupId,
                     })),
                 plugins: ['remove_button'],
             },
@@ -147,7 +147,7 @@ class RowView extends React.Component {
                     <Editable
                         className="tags"
                         options={groupsEditableOptions}
-                        onChange={value => this.onSave({ show_to_groups: value.split(',') })}>
+                        onChange={value => this.onSave({ showToGroups: value.split(',') })}>
                         {showToGroups.map(group => (
                             <span key={group} className="label label-default">{group}</span>
                         ))}
@@ -206,9 +206,9 @@ class AddButton extends React.Component {
             variables: {
                 id: null,
                 date: moment().endOf('day').toISOString(),
-                show_to_groups: this.props.data.groups
-                    .filter(group => group.show)
-                    .map(group => group.group_id),
+                showToGroups: this.props.data.groups
+                    .filter(group => group.active)
+                    .map(group => group.groupId),
             },
         });
     }
@@ -241,7 +241,7 @@ export default class AllStatusReports extends React.Component {
             dueDates: {
                 loading: dueDatesLoading,
                 error: dueDatesError,
-                status_report_due_dates,
+                statusReportDueDates,
             },
             manage,
             users: {
@@ -261,17 +261,17 @@ export default class AllStatusReports extends React.Component {
         } else if (error) {
             content = <tr><td colSpan="3"><span className="fas fa-exclamation-triangle"></span> {error}</td></tr>;
         } else {
-            content = status_report_due_dates.map(dueDate => {
+            content = statusReportDueDates.map(dueDate => {
                 dueDate = {
                     date: moment(dueDate.date),
                     id: dueDate.id,
-                    show_to_groups: dueDate.show_to_groups,
+                    showToGroups: dueDate.showToGroups,
                 };
 
                 const dueDateUsers = users
-                    .filter(user => user.status_report_due_dates.find(d => d.id === dueDate.id))
+                    .filter(user => user.statusReportDueDates.find(d => d.id === dueDate.id))
                     .map(user => {
-                        const report = user.status_reports.find(r => r.date_due.id === dueDate.id);
+                        const report = user.statusReports.find(r => r.dateDue.id === dueDate.id);
 
                         return {
                             avatar: user.avatar,

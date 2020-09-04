@@ -34,7 +34,7 @@ export default class Calendar extends React.Component {
             const entries = calendar.items.map(item => {
                 let dateText;
 
-                if (item.all_day) {
+                if (item.allDay) {
                     const date = moment(item.start).utc();
                     dateText = date.format('ddd, DD MMM YYYY');
                 } else {
@@ -58,7 +58,7 @@ export default class Calendar extends React.Component {
                     <ul className="event-list">
                         {entries}
                     </ul>
-                    <a href={calendar.subscribe_url}>Subscribe to ICS</a>
+                    <a href={calendar.subscribeURL}>Subscribe to ICS</a>
                 </div>
             );
         }

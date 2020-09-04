@@ -15,7 +15,7 @@ class RowView extends React.Component {
         return (
             <tr>
                 <td className="avatars">
-                    <Link to={`/users/${user.slack_username}`}>
+                    <Link to={`/users/${user.slackUsername}`}>
                         {user.avatar ? (
                             <img src={user.avatar} className="img-rounded avatar-small" />
                         ) : (

@@ -7,13 +7,13 @@ if (!production) {
 
 import 'newrelic';
 import bodyParser from 'body-parser';
-import connectMongo from 'connect-mongo';
 import errorHandler from 'errorhandler';
 import express from 'express';
 import logger from 'morgan';
 import passport from 'passport';
 import { init as sentryInit } from '@sentry/node';
 import session from 'express-session';
+import sessionStore from 'express-session-sequelize';
 
 import routes from './lib/routes';
 import init from './lib/init';
@@ -43,13 +43,13 @@ init()
             app.use(errorHandler());
         }
 
-        const MongoStore = connectMongo(session);
+        const SessionStore = sessionStore(session.Store);
         app.use(session({
             cookie: {
                 maxAge: 1000 * 60 * 60 * 24 * 30
             },
-            store: new MongoStore({
-                mongooseConnection: options.db
+            store: new SessionStore({
+                db: options.sequelize,
             }),
             resave: false,
             saveUninitialized: true,

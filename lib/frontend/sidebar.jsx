@@ -43,7 +43,7 @@ class GroupsItems extends React.Component {
 
             groups.forEach(group => {
                 group.users.forEach(user => {
-                    if (user.primary_mentor === window.userId &&
+                    if (user.assignedMentor === window.userId &&
                         !myStudentsIds.has(user.id)) {
                         myStudentsIds.add(user.id);
                         myStudents.push(user);
@@ -60,7 +60,7 @@ class GroupsItems extends React.Component {
                             .map(user => (
                                 <SidebarItem
                                     key={user.id}
-                                    to={`/users/${user.slack_username}`}
+                                    to={`/users/${user.slackUsername}`}
                                     icon={user.avatar}
                                     label={user.name}
                                 />
@@ -76,7 +76,7 @@ class GroupsItems extends React.Component {
                         {group.users.map(user => (
                             <SidebarItem
                                 key={user.id}
-                                to={`/users/${user.slack_username}`}
+                                to={`/users/${user.slackUsername}`}
                                 icon={user.avatar}
                                 label={user.name}
                             />
