@@ -1,8 +1,9 @@
 // jshint ignore: start
 
+import compose from 'lodash.flowright';
 import moment from 'moment';
 import React from 'react';
-import { compose, graphql } from 'react-apollo';
+import { graphql } from 'react-apollo';
 import ReactDOM from 'react-dom';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
