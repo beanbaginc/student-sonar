@@ -7,6 +7,7 @@ import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
 
+import AllGroups from './all-groups';
 import AllStatusReports from './all-status-reports';
 import AllUsers from './all-users';
 import Calendar from './calendar';
@@ -127,6 +128,18 @@ export default class Application extends React.Component {
                             path="/status/view/:reportId" exact
                             render={props => (
                                 <ViewStatusReport {...props} />
+                            )}
+                        />
+                        <Route
+                            path="/groups" exact
+                            render={props => (
+                                <React.Fragment>
+                                    {isMentor ? (
+                                        <AllGroups {...props} />
+                                    ) : (
+                                        <PermissionDenied />
+                                    )}
+                                </React.Fragment>
                             )}
                         />
                         <Route

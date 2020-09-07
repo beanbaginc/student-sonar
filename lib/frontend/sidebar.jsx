@@ -108,6 +108,7 @@ export default class Sidebar extends React.Component {
                     {loggedIn && <SidebarItem to="/status" label="My Status Reports" />}
                     {loggedIn && <SidebarItem to="/status/all" label="All Status Reports" />}
                     {isMentor && <GroupsItems />}
+                    {isMentor && <SidebarItem to="/groups" label="All Groups" />}
                     {isMentor && <SidebarItem to="/users" label="All Users" />}
                 </ul>
             </div>

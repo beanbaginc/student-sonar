@@ -311,7 +311,7 @@ export default class AllStatusReports extends React.Component {
                         {manage && (
                             <tfoot>
                                 <tr>
-                                    <td colSpan="4">
+                                    <td colSpan="3">
                                         <AddButton />
                                     </td>
                                 </tr>

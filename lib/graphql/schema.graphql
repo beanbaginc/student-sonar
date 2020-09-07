@@ -17,6 +17,18 @@ type Query {
 
 
 type Mutation {
+    deleteGroup(
+        id: ID!
+    ): ID!
+
+    saveGroup(
+        active: Boolean!
+        groupId: String!
+        id: ID
+        name: String!
+        showInSidebar: Boolean!
+    ): Group
+
     saveStatusReport(
         dateDue: ID!
         id: ID
@@ -68,6 +80,7 @@ type Group {
     name: String!
     active: Boolean!
     users: [User!]!
+    showInSidebar: Boolean!
 }
 
 
