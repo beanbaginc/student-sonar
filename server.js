@@ -11,9 +11,9 @@ import errorHandler from 'errorhandler';
 import express from 'express';
 import logger from 'morgan';
 import passport from 'passport';
-import { init as sentryInit } from '@sentry/node';
 import session from 'express-session';
 import sessionStore from 'express-session-sequelize';
+import * as Sentry from '@sentry/node';
 
 import routes from './lib/routes';
 import init from './lib/init';
@@ -21,13 +21,20 @@ import init from './lib/init';
 
 init()
     .then(options => {
-        if (options.config.sentryDsnBackend) {
-            sentryInit({
-                dsn: options.config.sentryDsnBackend,
-            });
-        }
-
         const app = express();
+
+        Sentry.init({
+            dsn: options.config.sentryDsnBackend,
+        });
+
+        app.use(Sentry.Handlers.errorHandler());
+        app.use(function onError(err, req, res, next) {
+            // The error id is attached to `res.sentry` to be returned
+            // and optionally displayed to the user for support.
+            res.statusCode = 500;
+            res.end(res.sentry + '\n');
+        });
+
         app.get('*.js', (req, res, next) => {
             req.url = req.url + '.gz';
             res.set('Content-Encoding', 'gzip');

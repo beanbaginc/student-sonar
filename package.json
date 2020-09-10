@@ -16,7 +16,8 @@
   "author": "David Trowbridge <david@beanbaginc.com>",
   "license": "MIT",
   "dependencies": {
-    "@sentry/node": "^4.6.6",
+    "@sentry/node": "^5.23.0",
+    "@sentry/react": "^5.23.0",
     "apollo-boost": "^0.1.28",
     "asana": "^0.16.6",
     "aws-sdk": "^2.740.0",
