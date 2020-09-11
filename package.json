@@ -60,7 +60,7 @@
     "moment": "^2.27.0",
     "morgan": "^1.10.0",
     "newrelic": "^4.13.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-sass": "^4.14.1",
     "passport": "^0.2.1",
     "passport-slack": "^0.0.1",
