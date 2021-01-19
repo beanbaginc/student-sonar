@@ -136,6 +136,8 @@ export default class EditStatusReport extends React.Component {
             });
         };
 
+        const unsaved = this.state.value === null || statusReport.text != this.state.value.text;
+
         return (
             <div className="status-report-editor">
                 <div className={`panel panel-default ${this.state.preview ? 'preview' : ''}`}>
@@ -143,7 +145,7 @@ export default class EditStatusReport extends React.Component {
                         <span>Status report for {moment(statusReport.dateDue.date).format('ddd, MMM D')}</span>
 
                         <span className="text-warning">
-                            {this.state.unsaved && 'There are unsaved changes'}
+                            {unsaved && 'There are unsaved changes'}
                         </span>
                         <ToggleSwitch
                             label="Preview"
