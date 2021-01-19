@@ -472,12 +472,10 @@ class ChatHistory extends React.Component {
                 const data = {};
 
                 for (let log of logs) {
-                    const key = log.timestamp.toString();
-
-                    if (data[key] === undefined) {
-                        data[key] = 1;
+                    if (data[log.timestamp] === undefined) {
+                        data[log.timestamp] = 1;
                     } else {
-                        data[key] += 1;
+                        data[log.timestamp] += 1;
                     }
                 }
 
@@ -496,15 +494,16 @@ class ChatHistory extends React.Component {
 
                     while (date.month() === currentMonth) {
                         const dayOfWeek = date.day();
-                        const count = data[date.unix().toString()] || 0;
+                        const timestamp = date.format('LL');
+                        const count = data[timestamp] || 0;
 
                         if (dayOfWeek === 0 || week === -1) {
                             week++;
                         }
 
                         const title = (count
-                            ? `${count} items on ${date.format('LL')}`
-                            : date.format('LL'));
+                            ? `${count} items on ${timestamp}`
+                            : timestamp);
 
                         month.days.push({
                             week: week,
@@ -764,7 +763,7 @@ export default class UserDetail extends React.Component {
         }
 
         const events = user.statusReports.map(report => {
-            const due = moment(report.dateDue.date);
+            const due = moment(report.dateDue.date).endOf('day');
             const submitted = report.dateSubmitted ? moment(report.dateSubmitted) : due;
 
             return {
@@ -785,7 +784,7 @@ export default class UserDetail extends React.Component {
             // New-style status reports.
             statusReportsItems = user.statusReportDueDates.map(dueDate => {
                 const report = user.statusReports.find(r => r.dateDue.id === dueDate.id);
-                const due = moment(dueDate.date);
+                const due = moment(dueDate.date).endOf('day');
                 let content;
 
                 if (report) {

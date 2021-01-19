@@ -264,7 +264,7 @@ export default class AllStatusReports extends React.Component {
         } else {
             content = statusReportDueDates.map(dueDate => {
                 dueDate = {
-                    date: moment(dueDate.date),
+                    date: moment(dueDate.date).endOf('day'),
                     id: dueDate.id,
                     showToGroups: dueDate.showToGroups,
                 };
