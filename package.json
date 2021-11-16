@@ -20,7 +20,7 @@
     "@sentry/react": "^5.23.0",
     "apollo-boost": "^0.1.28",
     "asana": "^0.16.6",
-    "aws-sdk": "^2.740.0",
+    "aws-sdk": "^2.814.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
