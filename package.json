@@ -61,7 +61,7 @@
     "morgan": "^1.10.0",
     "newrelic": "^4.13.1",
     "node-fetch": "^2.6.0",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "passport": "^0.2.1",
     "passport-slack": "^0.0.1",
     "pg": "^8.3.3",
