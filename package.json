@@ -57,7 +57,7 @@
     "less-loader": "^4.1.0",
     "lodash.flowright": "^3.5.0",
     "memjs": "^1.2.2",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "morgan": "^1.10.0",
     "newrelic": "^4.13.1",
     "node-fetch": "^2.6.0",
