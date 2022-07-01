@@ -1,9 +1,7 @@
-from __future__ import unicode_literals
-
 import dateutil
 
-from django.utils import six
 from djblets.util.decorators import augment_method_from
+from djblets.webapi.fields import StringFieldType
 from djblets.webapi.decorators import webapi_request_fields
 from reviewboard.reviews.models.review import Review
 from reviewboard.webapi.decorators import webapi_check_local_site
@@ -22,19 +20,19 @@ class ReviewResource(BaseReviewResource):
     @webapi_request_fields(
         optional={
             'from-user': {
-                'type': six.text_type,
+                'type': StringFieldType,
                 'description': 'The username that the reviews must be owned '
                                'by.',
             },
             'time-added-to': {
-                'type': six.text_type,
+                'type': StringFieldType,
                 'description': 'The date/time that all reviews must be added '
                                'before. This is compared against the '
                                'review\'s ``timestamp`` field. This must be '
                                'a valid :term:`date/time format`.',
             },
             'time-added-from': {
-                'type': six.text_type,
+                'type': StringFieldType,
                 'description': 'The date/time that all reviews must be added '
                                'after. This is compared against the '
                                'review\'s ``timestamp`` field. This must be '

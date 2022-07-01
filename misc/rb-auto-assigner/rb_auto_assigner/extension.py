@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import logging
 
 from django.db.models.signals import post_save
@@ -44,12 +42,12 @@ class RBAutoAssigner(Extension):
 
         try:
             group = Group.objects.get(name=self.auto_assign_group)
+
+            logging.debug('rb_auto_assigner auto-assigning review request from '
+                          'user %s to group %s',
+                          user.username, group.name)
+
+            instance.target_groups.add(group)
         except Group.DoesNotExist:
             logging.error('rb_auto_assigner can not find a group with '
                           'name %s', self.auto_assign_group)
-
-        logging.debug('rb_auto_assigner auto-assigning review request from '
-                      'user %s to group %s',
-                      user.username, group.name)
-
-        instance.target_groups.add(group)

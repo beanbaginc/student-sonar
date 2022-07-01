@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-
 from django.forms import CharField, Textarea
 from django.utils.translation import ugettext_lazy as _
 from djblets.extensions.forms import SettingsForm

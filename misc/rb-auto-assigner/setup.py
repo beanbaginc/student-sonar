@@ -1,10 +1,8 @@
-from __future__ import unicode_literals
-
 from reviewboard.extensions.packaging import setup
 
 
 PACKAGE = 'rb_auto_assigner'
-VERSION = '0.1'
+VERSION = '1.0'
 
 setup(
     name=PACKAGE,
