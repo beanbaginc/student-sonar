@@ -1,8 +1,8 @@
 // jshint ignore: start
 
+import { graphql } from '@apollo/client/react/hoc';
 import moment from 'moment';
 import React from 'react';
-import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
 import showdown from 'showdown';
 

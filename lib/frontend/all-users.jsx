@@ -1,7 +1,7 @@
 // jshint ignore: start
 
+import { graphql } from '@apollo/client/react/hoc';
 import React from 'react';
-import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
 import { Link } from 'react-router-dom';
 

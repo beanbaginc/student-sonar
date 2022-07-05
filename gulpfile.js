@@ -24,4 +24,4 @@ gulp.task('css', () => gulp.src('css/style.less')
 gulp.task('images', () => gulp.src('images/*')
     .pipe(gulp.dest('build/images/')));
 
-gulp.task('default', ['clean'], () => gulp.start('webpack', 'css', 'images'));
+gulp.task('default', gulp.series(['clean', 'webpack', 'css', 'images']))

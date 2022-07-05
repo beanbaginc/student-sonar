@@ -1,8 +1,7 @@
 // jshint ignore: start
 
-import ApolloClient from 'apollo-boost';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import React from 'react';
-import { ApolloProvider } from 'react-apollo';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { BrowserRouter, Route } from 'react-router-dom';
@@ -52,7 +51,10 @@ export default class Application extends React.Component {
     constructor(props) {
         super(props);
 
+        const cache = new InMemoryCache();
+
         this.client = new ApolloClient({
+            cache,
             uri: '/api/graphql',
             fetchOptions: {
                 credentials: 'include',

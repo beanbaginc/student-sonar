@@ -1,7 +1,7 @@
 // jshint ignore: start
 
+import { graphql } from '@apollo/client/react/hoc';
 import React from 'react';
-import { graphql } from 'react-apollo';
 import { connect } from 'react-redux';
 import { NavLink, withRouter } from 'react-router-dom';
 

@@ -1,8 +1,8 @@
 // jshint ignore: start
 
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'lodash.flowright';
 import React from 'react';
-import { graphql } from 'react-apollo';
 import Helmet from 'react-helmet';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';

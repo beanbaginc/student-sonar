@@ -13,6 +13,7 @@ import logger from 'morgan';
 import passport from 'passport';
 import session from 'express-session';
 import sessionStore from 'express-session-sequelize';
+import expressStaticGzip from 'express-static-gzip';
 import * as Sentry from '@sentry/node';
 
 import routes from './lib/routes';
@@ -35,13 +36,9 @@ init()
         res.end(res.sentry + '\n');
     });
 
-    app.get('*.js', (req, res, next) => {
-        req.url = req.url + '.gz';
-        res.set('Content-Encoding', 'gzip');
-        res.set('Content-Type', 'text/javascript');
-        next();
-    });
-    app.use('/scripts', express.static('build/scripts'));
+    app.use('/scripts', expressStaticGzip('build/scripts', {
+        enableBrotli: true,
+    }));
 
     if (production) {
         app.use('/images', express.static('build/images'));

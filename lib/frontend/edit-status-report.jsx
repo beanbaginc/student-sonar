@@ -1,9 +1,9 @@
 // jshint ignore: start
 
+import { graphql } from '@apollo/client/react/hoc';
 import compose from 'lodash.flowright';
 import moment from 'moment';
 import React from 'react';
-import { graphql } from 'react-apollo';
 import ReactMDE from 'react-mde';
 
 import { EDIT_STATUS_REPORT_QUERY, saveStatusReport } from './api/status-report';

@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const CompressionPlugin = require('compression-webpack-plugin');
+const zlib = require('zlib');
 
 
 module.exports = {
@@ -24,17 +25,20 @@ module.exports = {
                 loader: 'babel-loader',
                 options: {
                     cacheDirectory: 'babel-cache',
-                    presets: ['react', 'env'],
-                    plugins: ['transform-class-properties', 'transform-decorators-legacy', 'dedent'],
+                    presets: ['@babel/preset-react', '@babel/preset-env'],
+                    plugins: [
+                        ['@babel/plugin-proposal-decorators', { "legacy": true }],
+                        'dedent'
+                    ],
                 },
             },
             {
-                test: /\.(s*)css$/,
-                loaders: ['style-loader','css-loader', 'sass-loader'],
+                test: /\.(scss|css)$/,
+                use: ['style-loader','css-loader', 'sass-loader'],
             },
             {
                 test: /\.less$/,
-                loaders: ['style-loader','css-loader', 'less-loader'],
+                use: ['style-loader','css-loader', 'less-loader'],
             },
             {
                 test: /\.(ttf|eot|woff|woff2)$/,
@@ -64,13 +68,22 @@ module.exports = {
             analyzerMode: 'static',
             openAnalyzer: false,
         }),
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new webpack.IgnorePlugin({
+            resourceRegExp: /^\.\/locale$/,
+            contextRegExp: /moment$/,
+        }),
         new CompressionPlugin({
-            asset: '[path].gz[query]',
-            algorithm: 'gzip',
-            test: /\.js$|\.css$|\.html$/,
+            filename: "[path][base].br",
+            algorithm: "brotliCompress",
+            test: /\.(js|css|html|svg)$/,
+            compressionOptions: {
+                params: {
+                  [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
+                },
+            },
             threshold: 10240,
             minRatio: 0.8,
+            deleteOriginalAssets: false,
         })
     ],
     resolve: {
