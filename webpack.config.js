@@ -1,11 +1,16 @@
-const webpack = require('webpack');
-const path = require('path');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CompressionPlugin = require('compression-webpack-plugin');
-const zlib = require('zlib');
+import webpack from 'webpack';
+import path from 'path';
+import bundleAnalyzer from 'webpack-bundle-analyzer';
+import CompressionPlugin from 'compression-webpack-plugin';
+import zlib from 'zlib';
+import { fileURLToPath } from 'url';
 
 
-module.exports = {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+export default {
     mode: (process.env.NODE_ENV === 'production' ? 'production' : 'development'),
     entry: path.join(__dirname, 'lib', 'frontend', 'main.js'),
     output: {
@@ -64,7 +69,7 @@ module.exports = {
             'window.jQuery': 'jquery',
             'window.$': 'jquery',
         }),
-        new BundleAnalyzerPlugin({
+        new bundleAnalyzer.BundleAnalyzerPlugin({
             analyzerMode: 'static',
             openAnalyzer: false,
         }),

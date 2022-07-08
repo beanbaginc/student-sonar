@@ -1,6 +1,6 @@
 // jshint ignore: start
 
-import { graphql } from '@apollo/client/react/hoc';
+import { graphql } from '@apollo/client/react/hoc/index.js';
 import compose from 'lodash.flowright';
 import moment from 'moment';
 import React from 'react';

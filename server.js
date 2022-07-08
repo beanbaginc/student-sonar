@@ -5,7 +5,6 @@ if (!production) {
 }
 
 
-import 'newrelic';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import express from 'express';
@@ -16,8 +15,8 @@ import sessionStore from 'express-session-sequelize';
 import expressStaticGzip from 'express-static-gzip';
 import * as Sentry from '@sentry/node';
 
-import routes from './lib/routes';
-import init from './lib/init';
+import routes from './lib/routes.js';
+import init from './lib/init.js';
 
 
 init()

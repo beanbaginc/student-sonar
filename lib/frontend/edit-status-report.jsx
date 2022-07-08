@@ -5,6 +5,7 @@ import compose from 'lodash.flowright';
 import moment from 'moment';
 import React from 'react';
 import ReactMDE from 'react-mde';
+import showdown from 'showdown';
 
 import { EDIT_STATUS_REPORT_QUERY, saveStatusReport } from './api/status-report';
 import ToggleSwitch from './toggle-switch';
@@ -59,6 +60,8 @@ const defaultContent = dedent`
       team meeting.
     `;
 
+const converter = new showdown.Converter();
+converter.setFlavor('github');
 
 @compose(
     graphql(EDIT_STATUS_REPORT_QUERY, {
@@ -74,20 +77,13 @@ const defaultContent = dedent`
 export default class EditStatusReport extends React.Component {
     constructor(props) {
         super(props);
-        this.onEditorChanged = this.onEditorChanged.bind(this);
 
         this.state = {
-            value: null,
             preview: false,
+            text: null,
             unsaved: false,
+            tab: 'write',
         };
-    }
-
-    onEditorChanged(value) {
-        this.setState({
-            value,
-            unsaved: true,
-        });
     }
 
     render() {
@@ -114,29 +110,18 @@ export default class EditStatusReport extends React.Component {
             );
         }
 
-        const mdeVisibility = {
-            textarea: !this.state.preview,
-            preview: this.state.preview,
-            previewHelp: false,
-        };
-
-        const mdeValue = this.state.value || {
-            text: statusReport.text || defaultContent,
-            selection: null,
-        };
-
         const onSaveClicked = () => {
             this.props.mutate({
                 variables: {
                     dateDue: statusReport.dateDue.id,
                     id: statusReport.id,
                     user: window.userId,
-                    text: this.state.value ? this.state.value.text : '',
+                    text: this.state.text || '',
                 },
             });
         };
 
-        const unsaved = this.state.value === null || statusReport.text != this.state.value.text;
+        const unsaved = this.state.unsaved || (this.state.text === null && statusReport.text === null);
 
         return (
             <div className="status-report-editor">
@@ -161,9 +146,11 @@ export default class EditStatusReport extends React.Component {
                     </div>
                     <div className="editor-container">
                         <ReactMDE
-                            value={mdeValue}
-                            onChange={this.onEditorChanged}
-                            visibility={mdeVisibility}
+                            value={this.state.text || statusReport.text || defaultContent}
+                            onChange={value => this.setState({ text: value, unsaved: true })}
+                            selectedTab={this.state.tab}
+                            onTabChange={tab => this.setState({ tab })}
+                            generateMarkdownPreview={markdown => Promise.resolve(converter.makeHtml(markdown))}
                         />
                     </div>
                 </div>

@@ -1,17 +1,17 @@
-var fs = require('fs'),
-    gulp = require('gulp'),
-    autoprefixer = require('gulp-autoprefixer'),
-    del = require('del'),
-    cleancss = require('gulp-clean-css'),
-    less = require('gulp-less'),
-    rename = require('gulp-rename'),
-    shell = require('gulp-shell'),
-    webpack = require('webpack-stream');
+import gulp from 'gulp';
+import autoprefixer from 'gulp-autoprefixer';
+import del from 'del';
+import cleancss from 'gulp-clean-css';
+import less from 'gulp-less';
+import rename from 'gulp-rename';
+import webpack from 'webpack-stream';
+
+import webpackConfig from './webpack.config.js';
 
 gulp.task('clean', () => del(['build']));
 
 gulp.task('webpack', () => gulp.src('lib/frontend/main.js', { read: false })
-    .pipe(webpack(require('./webpack.config.js')))
+    .pipe(webpack(webpackConfig))
     .pipe(gulp.dest('build/scripts/')));
 
 gulp.task('css', () => gulp.src('css/style.less')

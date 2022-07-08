@@ -1,6 +1,6 @@
-import init from '../lib/init';
-import schema from '../lib/schema';
-import Slack from '../lib/slack';
+import init from '../lib/init.js';
+import schema from '../lib/schema.js';
+import Slack from '../lib/slack.js';
 
 function updateUser(user) {
     if (user.is_bot || user.id === 'USLACKBOT') {
