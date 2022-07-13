@@ -38,8 +38,8 @@ export default {
                 },
             },
             {
-                test: /\.(scss|css)$/,
-                use: ['style-loader','css-loader', 'sass-loader'],
+                test: /\.css$/,
+                use: ['style-loader','css-loader'],
             },
             {
                 test: /\.less$/,
