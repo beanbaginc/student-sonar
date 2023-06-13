@@ -6,8 +6,8 @@ import boto3
 
 
 def main():
-    dynamodb = boto3.resource('dynamodb')
-    sqs = boto3.resource('sqs')
+    dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+    sqs = boto3.resource('sqs', region_name='us-east-1')
 
     queue = sqs.get_queue_by_name(QueueName='reviewboard-slack-logs')
     table = dynamodb.Table('reviewboard-slack-logs')
