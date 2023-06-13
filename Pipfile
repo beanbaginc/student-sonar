@@ -1,5 +1,5 @@
 [requires]
-python_full_version = "2.7.15"
+python_full_version = "3.11.4"
 
 [packages]
-boto = "==2.42.0"
+boto3 = "==1.26.152"
